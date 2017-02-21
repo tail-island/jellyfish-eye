@@ -332,6 +332,7 @@ motorcycles <span class="op">=</span> (
 <p>うん、なだらかかつ非線形ですな。ギャップがなくて直線じゃあないですもん。</p>
 <p>あと、活性化関数にはもう一つ特徴が必要で、それは「微分できる」ことなんです。重みやバイアスをどの程度変えたらどのように出力が変わるのかが微分で分かるみたいで、そうすれば積み重ねたニューロンを、前の層へ、出力から入力へと逆に調整していくことが可能になるんです。このような、微分をうまいこと使って誤差を逆向きに伝播させて学習させる方式を、逆誤差伝播学習法（バックプロパゲーション）と呼びます。</p>
 <p>このような、出力を実数にして活性化関数を間に挟んで、逆誤差伝播学習法に類する方法で複数層のニューロンを学習させるという方式が、1960年代という大昔に発明されました。ただ、当時のコンピューターは貧弱すぎて、逆誤差伝播学習法はまともに動かなかったみたい。使えないものだからみんなすぐに忘れ、また誰かが再発明してまたみんなに忘れられ……という可哀想な運命を辿った挙句、1986年にラメルハートさんとその仲間たちが逆誤差伝播学習法と名づけたあたりで、コンピューターの性能が追いついてやっと定着したみたい。</p>
+<p>TODO: 以下の勾配消失の説明を修正すること！　掛け算の問題みたい。</p>
 <p>ただ、先程紹介したシグモイド関数って、端の方にいくと変化が小さくなってしまうんですよ。変化が小さいということは微分した結果も小さくなるということで、伝播が少ないので学習が進みづらくなってしまいます。この問題を、勾配消失問題と呼びます。だから、今ではシグモイド関数はあまり使われていなくて、ReLUという以下の図のような特徴を持つ活性化関数が流行っています。</p>
 <p>＊＊＊ReLUの図＊＊＊</p>
 <p>この図は、先程のシグモイド関数の場合とは全然似ていませんけど、でも、これでも活性化関数として使えるんです。線はつながっているので、まぁなだらかと言えます。0のところで曲がっていますから、線形ではありません。0のところは数学的には微分できませんけど、0か1のどちらかに決め打っちゃえば大丈夫です（劣微分と言います）。ほら、なんとかなりました！　0以下は変化が無いので学習が止まっちゃいそうですけど、0以上ならばどこまでいっても一定の比率で学習が進みそうです。</p>
@@ -445,12 +446,12 @@ b <span class="op">=</span> np.array([<span class="dv">7</span>, <span class="dv
 <span class="co"># MNISTデータを取得します。</span>
 train_data_set, validation_data_set, test_data_set <span class="op">=</span> input_data.read_data_sets(<span class="st">&quot;MNIST_data/&quot;</span>)
 
-<span class="co"># 画像と正解ラベルを入れる変数を作成します。</span>
+<span class="co"># 画像と正解ラベル、トレーニング中かをを入れる変数を作成します。</span>
 images <span class="op">=</span> tf.placeholder(tf.float32, (<span class="va">None</span>, <span class="dv">784</span>))
 labels <span class="op">=</span> tf.placeholder(tf.int32, (<span class="va">None</span>,))
 
-<span class="co"># ニューラル・ネットワークを定義します。TensorFlowでは、ニューラル・ネットワークの出力はlogitと呼ばれます。</span>
-logits <span class="op">=</span> tf.contrib.layers.linear(tf.contrib.layers.fully_connected(images, <span class="dv">30</span>), <span class="dv">10</span>)
+<span class="co"># ニューラル・ネットワークを定義します。TensorFlowでは、ニューラル・ネットワークの出力はlogitと呼びます。</span>
+logits <span class="op">=</span> tf.contrib.layers.linear(tf.contrib.layers.fully_connected(images, <span class="dv">128</span>), <span class="dv">10</span>)
 
 <span class="co"># logitとlabelsの誤差を計算します。TensorFlowでは、lossと呼びます。</span>
 loss <span class="op">=</span> tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels<span class="op">=</span>labels, logits<span class="op">=</span>logits))
@@ -466,33 +467,90 @@ accuracy <span class="op">=</span> tf.reduce_mean(tf.cast(tf.nn.in_top_k(logits,
     <span class="co"># tf.contrib.layersで変数を使用しているので、初期化します。</span>
     session.run(tf.global_variables_initializer())
 
-    <span class="co"># 10000回、訓練します。</span>
-    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">10000</span>):
+    <span class="co"># 3000回、訓練します。</span>
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3000</span>):
         <span class="co"># 1回の訓練では、100個のデータを使用します。</span>
         images_value, labels_value <span class="op">=</span> train_data_set.next_batch(<span class="dv">100</span>)
         session.run(train, feed_dict<span class="op">=</span>{images: images_value, labels: labels_value})
 
         <span class="co"># 精度の推移を知るために、100回に一回、訓練データと検証データでの精度を出力します。</span>
         <span class="cf">if</span> i <span class="op">%</span> <span class="dv">100</span> <span class="op">==</span> <span class="dv">0</span>:
-            <span class="bu">print</span>(<span class="st">&quot;accuracy of train data: </span><span class="sc">{0}</span><span class="st">&quot;</span>.<span class="bu">format</span>(session.run(accuracy, feed_dict<span class="op">=</span>{images: train_data_set.images, labels: train_data_set.labels})))
+            <span class="bu">print</span>(<span class="st">&quot;accuracy of train data: </span><span class="sc">{0}</span><span class="st">&quot;</span>.<span class="bu">format</span>(session.run(accuracy, feed_dict<span class="op">=</span>{images: images_value, labels: labels_value})))
             <span class="bu">print</span>(<span class="st">&quot;accuracy of validation data: </span><span class="sc">{0}</span><span class="st">&quot;</span>.<span class="bu">format</span>(session.run(accuracy, feed_dict<span class="op">=</span>{images: validation_data_set.images, labels: validation_data_set.labels})))
 
     <span class="co"># テスト・データでの精度を出力します。</span>
     <span class="bu">print</span>(<span class="st">&quot;accuracy of test data: </span><span class="sc">{0}</span><span class="st">&quot;</span>.<span class="bu">format</span>(session.run(accuracy, feed_dict<span class="op">=</span>{images: test_data_set.images, labels: test_data_set.labels})))</code></pre></div>
 <p>MNISTのデータを取得する部分は、前に述べた通り。このデータを計算具フラフに直接入れてしまうと毎回同じ計算をすることになってしまいますから、<code>tf.placeholder()</code>を経由して接続します。<code>tf.placeholder()</code>の第一引数は要素の型（MNISTの画像のデータは0.0〜1.0なので<code>tf.float32</code>、正解ラベルは1とか2なので<code>tf.int32</code>）、第二引数は要素の数です。画像は28x28=784個になるのですけど、その前に<code>None</code>と書かれているのは、バッチ学習に対応するためです。</p>
-<p>バッチ学習といは、複数のデータを使用してバッチ的に学習する方式です。データ一つだけで訓練をすると、右往左往して学習が進まないんですよ。だから、複数のデータをまとめて計算して、その平均を誤差として扱うわけです。で、このバッチ学習のためにデータをまとめる数をあとから指定できるように、<code>None</code>を指定しています。</p>
-<p>ニューラル・ネットワークの定義は、<code>tf.contrib.layers.fully_connected()</code>の結果を<code>tf.contrib.layers.linear()</code>しているだけ。理由は調べても分からなかったのですけど、TensorFlowではニューラル・ネットワークの計算グラフを<code>logits</code>という変数に格納する流儀になっています。</p>
-<p><code>fully_connected()</code>は前項で述べたように多層パーセプトロンの層の生成で、<code>linear()</code>は活性化関数を含まない多層パーセプトロンの層の生成です。引数は、入力となる計算グラフと生成したいパーセプトロンの数。ちなみに最後を<code>linear()</code>にしているのは、どのような出力にするのかを後から選べるようにするためです。どの数字かを当てるだけならそのままでよいですし、1の可能性が83.4%、2の可能性が13.2%のように表示したいなら<code>tf.nn.softmax()</code>してあげてください。今回のように逆誤差伝播学習法で学習したいなら、誤差計算のところのコードのように<code>tf.nn.sparse_softmax_cross_entropy_with_logits()</code>してあげればよいでしょう。誤差の計算では、今回はバッチ学習ですから、各データの誤差を平均するために<code>tf.reduce_mean()</code>しています。</p>
-<p>次、訓練方法。学習率を考えるのは大変なので<code>tf.train.AdamOptimizer</code>を使い、誤差を最小化するように訓練するので<code>minimize()</code>を使用します。あと、どの程度正解したかを確認するための<code>accuracy</code>という計算グラフも定義しています。<code>tf.nn.in_top_k()</code>は、<code>logit[label]</code>が、第三引数で指定した値の順位に収まっているかを調べてくれます。<code>logits</code>が<code>[1, 2, 3]</code>で<code>label</code>が<code>2</code>で第三引数が<code>1</code>なら<code>False</code>、第三引数が<code>2</code>なら<code>True</code>になるわけです。</p>
-<p>と、ここまでで計算グラフの定義は完了で、あとは訓練するだけ。セッションを作成して、変数を初期化して、バッチ学習用のデータを取得して、訓練用の計算グラフである<code>train</code>を実行します。<code>train</code>が参照している<code>loss</code>が参照している<code>logits</code>の計算グラフには<code>images</code>と<code>labels</code>が含まれていて、このままではその値が確定しないので計算できませんから、名前付き引数の<code>feed_dict</code>としてバッチ学習用のデータを渡しています。</p>
-<p>で、これで必須の作業は終わりなのですけど、訓練の結果どの程度正解したか、知りたいですよね？　だから、上のコードでは時々正解率を表示しています。この正解率は、訓練データと検証データ、最後にはテスト・データで分けて表示しています。このようにしているのは、訓練データに特化した学習（過学習といいます）をしてしまうのを避けるためです。ある問題集で全問正解するにはその問題集の解答を丸暗記してしまえばよいわけで、これが過学習に相当する状態です。過学習して解答を丸暗記しただけでは、他の問題集の問題は解けないので、試験に落ちちゃう。だから、訓練データでの正解率に加えて、訓練には使用していない検証データでも正解率も調べているわけです。訓練データでの正解率は向上しているけど検証データでの正解率は向上しない場合は、過学習に陥ったと考えることができるわけ。検証データに加えてテスト・データでも正解率を出しているのは、ニューラル・ネットワークを調整（パーセプトロンの数を増やすとか、層を追加するとか）する際に、たまたま検証データに最適化した調整をしてしまうのを防ぐためです。検証データを使用して過学習を防いで、そのニューラル・ネットワークが本当に役に立つのかをテスト・データで検証する感じですね。</p>
+<p>バッチ学習というのは、複数のデータを使用してバッチ的に学習する方式です。データ一つだけで訓練をすると、右往左往して学習が進まないんですよ。だから、複数のデータをまとめて計算して、その平均を誤差として扱うわけ。で、このバッチ学習のためにデータをまとめる数をあとから指定できるように、<code>None</code>を指定しています。</p>
+<p>ニューラル・ネットワークの定義は、<code>tf.contrib.layers.fully_connected()</code>の結果を<code>tf.contrib.layers.linear()</code>しているだけ。TensorFlowではニューラル・ネットワークの計算グラフを<code>logits</code>という変数に格納する流儀になっている（理由は調べても分からなかった……）ので、それに従っています。</p>
+<p><code>fully_connected()</code>は前項で述べたように多層パーセプトロンの層の生成で、<code>linear()</code>は活性化関数を含まない多層パーセプトロンの層の生成です。引数は、入力となる計算グラフと生成したいパーセプトロンの数。ちなみに最後を<code>linear()</code>にしているのは、どのような出力にするのかを後から選べるようにするためです。どの数字かを当てるだけならそのままでよいですし、1の可能性が83.4%、2の可能性が13.2%のように表示したいなら<code>tf.nn.softmax()</code>してあげてください。今回のように逆誤差伝播学習法で学習したいなら、誤差計算のところのコードのように<code>tf.nn.sparse_softmax_cross_entropy_with_logits()</code>してあげればよいでしょう。誤差の計算では、今回はバッチ学習なので、各データの誤差を平均するために<code>tf.reduce_mean()</code>しています。</p>
+<p>次、訓練方法。学習率を考えるのは大変なので<code>tf.train.AdamOptimizer</code>を使って全て任せることにして、誤差を最小化するように訓練するので<code>minimize()</code>を使用しています。あと、どの程度正解したかを確認するための<code>accuracy</code>という計算グラフも定義しておきます。<code>tf.nn.in_top_k()</code>は、<code>logit[label]</code>が、第三引数で指定した値の順位に収まっているかを調べます。<code>logits</code>が<code>[1, 2, 3]</code>で<code>label</code>が<code>2</code>の場合、第三引数が<code>1</code>なら<code>False</code>、第三引数が<code>2</code>なら<code>True</code>になるわけですね。で、バッチ学習なので結果は<code>True</code>や<code>False</code>のベクトルになって、Pythonの<code>True</code>は1、<code>False</code>は0として扱えるので、<code>tf.float32</code>にキャストして<code>tf.reduce_mean()</code>で平均を取って正解率としています。</p>
+<p>以上で計算グラフの定義は完了、あとは訓練するだけ。セッションを作成して、変数を初期化して、バッチ学習用のデータを取得して、訓練用の計算グラフである<code>train</code>を実行します。<code>train</code>が参照している<code>loss</code>が参照している<code>logits</code>の計算グラフには<code>images</code>と<code>labels</code>が含まれていて、それらの値が確定しないと計算を開始できませんから、名前付き引数の<code>feed_dict</code>でバッチ学習用のデータを渡しています。</p>
+<p>で、これで必須の作業は終わりなのですけど、訓練の結果どの程度正解したかを知りたいですよね？　だから、上のコードでは時々正解率を表示するようにしています。この正解率は、訓練データと検証データ、最後にはテスト・データの場合を表示しています。何度も似た情報を出力しているのは、訓練データに特化した学習（過学習といいます）をしてしまうのを避けるため。たとえばある問題集の解答を丸暗記すればその問題集には全問正解できるけれど、それでは他の問題集の問題は解けないので試験に落ちちゃう。訓練には使用していない検証データでも正解率も調べて、訓練データでの正解率は向上しているけど検証データでの正解率は向上しない場合は、過学習に陥ったと考えることができるわけ。検証データに加えてテスト・データでも正解率を出しているのは、ニューラル・ネットワークを調整（パーセプトロンの数を増やすとか、層を追加するとか）する際に、たまたま検証データに最適化した調整をしてしまうのを防ぐためです。検証データを使用して過学習を防いで、そのニューラル・ネットワークが本当に役に立つのかをテスト・データで検証していきます。</p>
 <p>はい、これで解説は終わり！　プログラムを実行しましょう。少し時間がかかりますけど、最後に以下のような出力が出ます。</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">accuracy of train data: <span class="fl">0.9788908958435059</span>
-accuracy of validation data: <span class="fl">0.9634000062942505</span>
-accuracy of test data: <span class="fl">0.9653000235557556</span></code></pre></div>
-<p>テスト・データでの正解率が96.5%ってのは、なかなか良い結果だと思いませんか？</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">accuracy of train data: <span class="fl">0.9900000095367432</span>
+accuracy of validation data: <span class="fl">0.9761999845504761</span>
+accuracy of test data: <span class="fl">0.9747999906539917</span></code></pre></div>
+<p>テスト・データでの正解率が97.5%ってのは、なかなか良い結果だと思いませんか？</p>
 <h2>畳み込みニューラルネットワーク</h2>
-<p>でもね、もっと正解率を向上できるんです。畳み込みニューラル・ネットワークならね。</p>
+<p>でもね、もっと正解率を向上できるんです。そう、畳み込みニューラル・ネットワークならね。</p>
+<h3 id="tensorflow">TensorFlowを使用した、畳み込みニューラルネットワーク</h3>
+<p>コードは、こんな感じ。</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> tensorflow <span class="im">as</span> tf
+
+<span class="im">from</span> tensorflow.examples.tutorials.mnist <span class="im">import</span> input_data
+
+<span class="co"># MNISTデータを取得します。</span>
+train_data_set, validation_data_set, test_data_set <span class="op">=</span> input_data.read_data_sets(<span class="st">&quot;MNIST_data/&quot;</span>)
+
+<span class="co"># 画像と正解ラベル、トレーニング中かをを入れる変数を作成します。</span>
+images <span class="op">=</span> tf.placeholder(tf.float32, (<span class="va">None</span>, <span class="dv">784</span>))
+labels <span class="op">=</span> tf.placeholder(tf.int32, (<span class="va">None</span>,))
+is_training <span class="op">=</span> tf.placeholder_with_default(<span class="va">False</span>, ())
+
+<span class="co"># ニューラル・ネットワークを定義します。TensorFlowでは、ニューラル・ネットワークの出力はlogitと呼びます。</span>
+logits <span class="op">=</span> tf.reshape(images, (<span class="op">-</span><span class="dv">1</span>, <span class="dv">28</span>, <span class="dv">28</span>, <span class="dv">1</span>))
+logits <span class="op">=</span> tf.contrib.layers.conv2d(logits, <span class="dv">32</span>, <span class="dv">5</span>)
+logits <span class="op">=</span> tf.contrib.layers.max_pool2d(logits, <span class="dv">2</span>)
+logits <span class="op">=</span> tf.contrib.layers.conv2d(logits, <span class="dv">64</span>, <span class="dv">5</span>)
+logits <span class="op">=</span> tf.contrib.layers.max_pool2d(logits, <span class="dv">2</span>)
+logits <span class="op">=</span> tf.contrib.layers.flatten(logits)
+logits <span class="op">=</span> tf.contrib.layers.fully_connected(logits, <span class="dv">128</span>)
+logits <span class="op">=</span> tf.contrib.layers.dropout(logits, is_training<span class="op">=</span>is_training)
+logits <span class="op">=</span> tf.contrib.layers.linear(logits, <span class="dv">10</span>)
+
+<span class="co"># logitとlabelsの誤差を計算します。TensorFlowでは、lossと呼びます。</span>
+loss <span class="op">=</span> tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels<span class="op">=</span>labels, logits<span class="op">=</span>logits))
+
+<span class="co"># どのように訓練するのかを定義します。lossが小さくなるように、学習率を自動で設定してくれるAdamOptimizerで訓練します。</span>
+train <span class="op">=</span> tf.train.AdamOptimizer().minimize(loss)
+
+<span class="co"># 正解率を計算します。</span>
+accuracy <span class="op">=</span> tf.reduce_mean(tf.cast(tf.nn.in_top_k(logits, labels, <span class="dv">1</span>), tf.float32))
+
+<span class="co"># セッションを作成します。</span>
+<span class="cf">with</span> tf.Session() <span class="im">as</span> session:
+    <span class="co"># tf.contrib.layersで変数を使用しているので、初期化します。</span>
+    session.run(tf.global_variables_initializer())
+
+    <span class="co"># 3000回、訓練します。</span>
+    <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3000</span>):
+        <span class="co"># 1回の訓練では、100個のデータを使用します。</span>
+        images_value, labels_value <span class="op">=</span> train_data_set.next_batch(<span class="dv">100</span>)
+        session.run(train, feed_dict<span class="op">=</span>{images: images_value, labels: labels_value, is_training: <span class="va">True</span>})
+
+        <span class="co"># 精度の推移を知るために、100回に一回、訓練データと検証データでの精度を出力します。</span>
+        <span class="cf">if</span> i <span class="op">%</span> <span class="dv">100</span> <span class="op">==</span> <span class="dv">0</span>:
+            <span class="bu">print</span>(<span class="st">&quot;accuracy of train data: </span><span class="sc">{0}</span><span class="st">&quot;</span>.<span class="bu">format</span>(session.run(accuracy, feed_dict<span class="op">=</span>{images: images_value, labels: labels_value})))
+            <span class="bu">print</span>(<span class="st">&quot;accuracy of validation data: </span><span class="sc">{0}</span><span class="st">&quot;</span>.<span class="bu">format</span>(session.run(accuracy, feed_dict<span class="op">=</span>{images: validation_data_set.images, labels: validation_data_set.labels})))
+
+    <span class="co"># テスト・データでの精度を出力します。</span>
+    <span class="bu">print</span>(<span class="st">&quot;accuracy of test data: </span><span class="sc">{0}</span><span class="st">&quot;</span>.<span class="bu">format</span>(session.run(accuracy, feed_dict<span class="op">=</span>{images: test_data_set.images, labels: test_data_set.labels})))</code></pre></div>
+<p>プログラムを実行しましょう。かなり長い時間がかかりますので、トイレに行ったりコーヒー飲んだりしてみてください。結果はどうかというと……</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">accuracy of train data: <span class="fl">1.0</span>
+accuracy of validation data: <span class="fl">0.9911999702453613</span>
+accuracy of test data: <span class="fl">0.9919999837875366</span></code></pre></div>
+<p>正解率が99%を超えて、99.2%になりました！　深層学習、すごいですな。</p>
 <section class="footnotes">
 <hr />
 <ol>

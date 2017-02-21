@@ -487,12 +487,12 @@ from tensorflow.examples.tutorials.mnist import input_data
 # MNISTデータを取得します。
 train_data_set, validation_data_set, test_data_set = input_data.read_data_sets("MNIST_data/")
 
-# 画像と正解ラベルを入れる変数を作成します。
+# 画像と正解ラベル、トレーニング中かをを入れる変数を作成します。
 images = tf.placeholder(tf.float32, (None, 784))
 labels = tf.placeholder(tf.int32, (None,))
 
-# ニューラル・ネットワークを定義します。TensorFlowでは、ニューラル・ネットワークの出力はlogitと呼ばれます。
-logits = tf.contrib.layers.linear(tf.contrib.layers.fully_connected(images, 30), 10)
+# ニューラル・ネットワークを定義します。TensorFlowでは、ニューラル・ネットワークの出力はlogitと呼びます。
+logits = tf.contrib.layers.linear(tf.contrib.layers.fully_connected(images, 128), 10)
 
 # logitとlabelsの誤差を計算します。TensorFlowでは、lossと呼びます。
 loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=logits))
@@ -508,15 +508,15 @@ with tf.Session() as session:
     # tf.contrib.layersで変数を使用しているので、初期化します。
     session.run(tf.global_variables_initializer())
 
-    # 10000回、訓練します。
-    for i in range(10000):
+    # 3000回、訓練します。
+    for i in range(3000):
         # 1回の訓練では、100個のデータを使用します。
         images_value, labels_value = train_data_set.next_batch(100)
         session.run(train, feed_dict={images: images_value, labels: labels_value})
 
         # 精度の推移を知るために、100回に一回、訓練データと検証データでの精度を出力します。
         if i % 100 == 0:
-            print("accuracy of train data: {0}".format(session.run(accuracy, feed_dict={images: train_data_set.images, labels: train_data_set.labels})))
+            print("accuracy of train data: {0}".format(session.run(accuracy, feed_dict={images: images_value, labels: labels_value})))
             print("accuracy of validation data: {0}".format(session.run(accuracy, feed_dict={images: validation_data_set.images, labels: validation_data_set.labels})))
 
     # テスト・データでの精度を出力します。
@@ -525,32 +525,104 @@ with tf.Session() as session:
 
 MNISTのデータを取得する部分は、前に述べた通り。このデータを計算具フラフに直接入れてしまうと毎回同じ計算をすることになってしまいますから、`tf.placeholder()`を経由して接続します。`tf.placeholder()`の第一引数は要素の型（MNISTの画像のデータは0.0〜1.0なので`tf.float32`、正解ラベルは1とか2なので`tf.int32`）、第二引数は要素の数です。画像は28x28=784個になるのですけど、その前に`None`と書かれているのは、バッチ学習に対応するためです。
 
-バッチ学習といは、複数のデータを使用してバッチ的に学習する方式です。データ一つだけで訓練をすると、右往左往して学習が進まないんですよ。だから、複数のデータをまとめて計算して、その平均を誤差として扱うわけです。で、このバッチ学習のためにデータをまとめる数をあとから指定できるように、`None`を指定しています。
+バッチ学習というのは、複数のデータを使用してバッチ的に学習する方式です。データ一つだけで訓練をすると、右往左往して学習が進まないんですよ。だから、複数のデータをまとめて計算して、その平均を誤差として扱うわけ。で、このバッチ学習のためにデータをまとめる数をあとから指定できるように、`None`を指定しています。
 
-ニューラル・ネットワークの定義は、`tf.contrib.layers.fully_connected()`の結果を`tf.contrib.layers.linear()`しているだけ。理由は調べても分からなかったのですけど、TensorFlowではニューラル・ネットワークの計算グラフを`logits`という変数に格納する流儀になっています。
+ニューラル・ネットワークの定義は、`tf.contrib.layers.fully_connected()`の結果を`tf.contrib.layers.linear()`しているだけ。TensorFlowではニューラル・ネットワークの計算グラフを`logits`という変数に格納する流儀になっている（理由は調べても分からなかった……）ので、それに従っています。
 
-`fully_connected()`は前項で述べたように多層パーセプトロンの層の生成で、`linear()`は活性化関数を含まない多層パーセプトロンの層の生成です。引数は、入力となる計算グラフと生成したいパーセプトロンの数。ちなみに最後を`linear()`にしているのは、どのような出力にするのかを後から選べるようにするためです。どの数字かを当てるだけならそのままでよいですし、1の可能性が83.4%、2の可能性が13.2%のように表示したいなら`tf.nn.softmax()`してあげてください。今回のように逆誤差伝播学習法で学習したいなら、誤差計算のところのコードのように`tf.nn.sparse_softmax_cross_entropy_with_logits()`してあげればよいでしょう。誤差の計算では、今回はバッチ学習ですから、各データの誤差を平均するために`tf.reduce_mean()`しています。
+`fully_connected()`は前項で述べたように多層パーセプトロンの層の生成で、`linear()`は活性化関数を含まない多層パーセプトロンの層の生成です。引数は、入力となる計算グラフと生成したいパーセプトロンの数。ちなみに最後を`linear()`にしているのは、どのような出力にするのかを後から選べるようにするためです。どの数字かを当てるだけならそのままでよいですし、1の可能性が83.4%、2の可能性が13.2%のように表示したいなら`tf.nn.softmax()`してあげてください。今回のように逆誤差伝播学習法で学習したいなら、誤差計算のところのコードのように`tf.nn.sparse_softmax_cross_entropy_with_logits()`してあげればよいでしょう。誤差の計算では、今回はバッチ学習なので、各データの誤差を平均するために`tf.reduce_mean()`しています。
 
-次、訓練方法。学習率を考えるのは大変なので`tf.train.AdamOptimizer`を使い、誤差を最小化するように訓練するので`minimize()`を使用します。あと、どの程度正解したかを確認するための`accuracy`という計算グラフも定義しています。`tf.nn.in_top_k()`は、`logit[label]`が、第三引数で指定した値の順位に収まっているかを調べてくれます。`logits`が`[1, 2, 3]`で`label`が`2`で第三引数が`1`なら`False`、第三引数が`2`なら`True`になるわけです。で、バッチ学習なので結果は`True`や`False`のベクトルになって、Pythonの`True`は1、`False`は0として扱えるので、`tf.float32`にキャストして`tf.reduce_mean()`で平均を取って正解率としています。
+次、訓練方法。学習率を考えるのは大変なので`tf.train.AdamOptimizer`を使って全て任せることにして、誤差を最小化するように訓練するので`minimize()`を使用しています。あと、どの程度正解したかを確認するための`accuracy`という計算グラフも定義しておきます。`tf.nn.in_top_k()`は、`logit[label]`が、第三引数で指定した値の順位に収まっているかを調べます。`logits`が`[1, 2, 3]`で`label`が`2`の場合、第三引数が`1`なら`False`、第三引数が`2`なら`True`になるわけですね。で、バッチ学習なので結果は`True`や`False`のベクトルになって、Pythonの`True`は1、`False`は0として扱えるので、`tf.float32`にキャストして`tf.reduce_mean()`で平均を取って正解率としています。
 
-以上で計算グラフの定義は完了、あとは訓練するだけ。セッションを作成して、変数を初期化して、バッチ学習用のデータを取得して、訓練用の計算グラフである`train`を実行します。`train`が参照している`loss`が参照している`logits`の計算グラフには`images`と`labels`が含まれていて、このままではその値が確定しないので計算を実行できませんから、名前付き引数の`feed_dict`としてバッチ学習用のデータを渡しています。
+以上で計算グラフの定義は完了、あとは訓練するだけ。セッションを作成して、変数を初期化して、バッチ学習用のデータを取得して、訓練用の計算グラフである`train`を実行します。`train`が参照している`loss`が参照している`logits`の計算グラフには`images`と`labels`が含まれていて、それらの値が確定しないと計算を開始できませんから、名前付き引数の`feed_dict`でバッチ学習用のデータを渡しています。
 
-で、これで必須の作業は終わりなのですけど、訓練の結果どの程度正解したか、知りたいですよね？　だから、上のコードでは時々正解率を表示しています。この正解率は、訓練データと検証データ、最後にはテスト・データで分けて表示しています。このようにしているのは、訓練データに特化した学習（過学習といいます）をしてしまうのを避けるためです。ある問題集で全問正解するにはその問題集の解答を丸暗記してしまえばよいわけで、これが過学習に相当する状態です。過学習して解答を丸暗記しただけでは、他の問題集の問題は解けないので、試験に落ちちゃう。だから、訓練データでの正解率に加えて、訓練には使用していない検証データでも正解率も調べているわけです。訓練データでの正解率は向上しているけど検証データでの正解率は向上しない場合は、過学習に陥ったと考えることができるわけ。検証データに加えてテスト・データでも正解率を出しているのは、ニューラル・ネットワークを調整（パーセプトロンの数を増やすとか、層を追加するとか）する際に、たまたま検証データに最適化した調整をしてしまうのを防ぐためです。検証データを使用して過学習を防いで、そのニューラル・ネットワークが本当に役に立つのかをテスト・データで検証する感じですね。
+で、これで必須の作業は終わりなのですけど、訓練の結果どの程度正解したかを知りたいですよね？　だから、上のコードでは時々正解率を表示するようにしています。この正解率は、訓練データと検証データ、最後にはテスト・データの場合を表示しています。何度も似た情報を出力しているのは、訓練データに特化した学習（過学習といいます）をしてしまうのを避けるため。たとえばある問題集の解答を丸暗記すればその問題集には全問正解できるけれど、それでは他の問題集の問題は解けないので試験に落ちちゃう。訓練には使用していない検証データでも正解率も調べて、訓練データでの正解率は向上しているけど検証データでの正解率は向上しない場合は、過学習に陥ったと考えることができるわけ。検証データに加えてテスト・データでも正解率を出しているのは、ニューラル・ネットワークを調整（パーセプトロンの数を増やすとか、層を追加するとか）する際に、たまたま検証データに最適化した調整をしてしまうのを防ぐためです。検証データを使用して過学習を防いで、そのニューラル・ネットワークが本当に役に立つのかをテスト・データで検証していきます。
 
 はい、これで解説は終わり！　プログラムを実行しましょう。少し時間がかかりますけど、最後に以下のような出力が出ます。
 
 ```python
-accuracy of train data: 0.9788908958435059
-accuracy of validation data: 0.9634000062942505
-accuracy of test data: 0.9653000235557556
+accuracy of train data: 0.9900000095367432
+accuracy of validation data: 0.9761999845504761
+accuracy of test data: 0.9747999906539917
 ```
 
-テスト・データでの正解率が96.5%ってのは、なかなか良い結果だと思いませんか？
+テスト・データでの正解率が97.5%ってのは、なかなか良い結果だと思いませんか？
 
 ## 畳み込みニューラルネットワーク
 
 でもね、もっと正解率を向上できるんです。そう、畳み込みニューラル・ネットワークならね。
 
+### 畳み込み？
+
+畳み込みニューラル・ネットワークの畳み込みというのは、いったい何なのでしょうか？　例によってWikipediaで調べると「関数gを平行移動しながら関数fに重ね足し合わせる二項演算である」とあるけど、やっぱり分けわからない……。
+
+これ、数学から考えないで、画像処理から考えると簡単に理解できます。
+
+### TensorFlowを使用した、畳み込みニューラルネットワーク
+
+コードは、こんな感じ。
+
+```python
+import tensorflow as tf
+
+from tensorflow.examples.tutorials.mnist import input_data
+
+# MNISTデータを取得します。
+train_data_set, validation_data_set, test_data_set = input_data.read_data_sets("MNIST_data/")
+
+# 画像と正解ラベル、トレーニング中かをを入れる変数を作成します。
+images = tf.placeholder(tf.float32, (None, 784))
+labels = tf.placeholder(tf.int32, (None,))
+is_training = tf.placeholder_with_default(False, ())
+
+# ニューラル・ネットワークを定義します。TensorFlowでは、ニューラル・ネットワークの出力はlogitと呼びます。
+logits = tf.reshape(images, (-1, 28, 28, 1))
+logits = tf.contrib.layers.conv2d(logits, 32, 5)
+logits = tf.contrib.layers.max_pool2d(logits, 2)
+logits = tf.contrib.layers.conv2d(logits, 64, 5)
+logits = tf.contrib.layers.max_pool2d(logits, 2)
+logits = tf.contrib.layers.flatten(logits)
+logits = tf.contrib.layers.fully_connected(logits, 128)
+logits = tf.contrib.layers.dropout(logits, is_training=is_training)
+logits = tf.contrib.layers.linear(logits, 10)
+
+# logitとlabelsの誤差を計算します。TensorFlowでは、lossと呼びます。
+loss = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels=labels, logits=logits))
+
+# どのように訓練するのかを定義します。lossが小さくなるように、学習率を自動で設定してくれるAdamOptimizerで訓練します。
+train = tf.train.AdamOptimizer().minimize(loss)
+
+# 正解率を計算します。
+accuracy = tf.reduce_mean(tf.cast(tf.nn.in_top_k(logits, labels, 1), tf.float32))
+
+# セッションを作成します。
+with tf.Session() as session:
+    # tf.contrib.layersで変数を使用しているので、初期化します。
+    session.run(tf.global_variables_initializer())
+
+    # 3000回、訓練します。
+    for i in range(3000):
+        # 1回の訓練では、100個のデータを使用します。
+        images_value, labels_value = train_data_set.next_batch(100)
+        session.run(train, feed_dict={images: images_value, labels: labels_value, is_training: True})
+
+        # 精度の推移を知るために、100回に一回、訓練データと検証データでの精度を出力します。
+        if i % 100 == 0:
+            print("accuracy of train data: {0}".format(session.run(accuracy, feed_dict={images: images_value, labels: labels_value})))
+            print("accuracy of validation data: {0}".format(session.run(accuracy, feed_dict={images: validation_data_set.images, labels: validation_data_set.labels})))
+
+    # テスト・データでの精度を出力します。
+    print("accuracy of test data: {0}".format(session.run(accuracy, feed_dict={images: test_data_set.images, labels: test_data_set.labels})))
+```
+
+プログラムを実行しましょう。かなり長い時間がかかりますので、トイレに行ったりコーヒー飲んだりしてみてください。結果はどうかというと……
+
+```python
+accuracy of train data: 1.0
+accuracy of validation data: 0.9911999702453613
+accuracy of test data: 0.9919999837875366
+```
+
+正解率が99%を超えて、99.2%になりました！　深層学習、すごいですな。
 
 
 [^4]: Chainerは、微分をライブラリ内に実装することでこの問題を解決しています。私のような一般人が作るニューラル・ネットワークなら、TensorFlowと同様に微分と無関係に深層学習できますので、ご安心ください。
