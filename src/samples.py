@@ -163,7 +163,7 @@
 
 # with tf.Session() as session:
 #     session.run(tf.global_variables_initializer())
-    
+
 #     result = session.run(e)
 #     print(result)
 
@@ -263,3 +263,60 @@ with tf.Session() as session:
 
     # テスト・データでの精度を出力します。
     print("accuracy of test data: {0}".format(session.run(accuracy, feed_dict={images: test_data_set.images, labels: test_data_set.labels})))
+
+########
+
+# import cv2  # 動かす前に、pip install opencv-pythonしておいてください。
+# import matplotlib.pyplot as plot  # 動かす前に、pip install matplotlibしておいてください。
+# import numpy as np
+
+# image = cv2.cvtColor(cv2.imread('./images/lena.jpg'), cv2.COLOR_BGR2GRAY)
+
+# # とりあえず、何もしないで表示します。
+# plot.imshow(image)
+# plot.show()
+
+# # フィルタリング（畳み込み）します。
+# filtered_image = cv2.filter2D(image, -1, np.array([[-1, -1, -1],
+#                                                    [-1,  8, -1],
+#                                                    [-1, -1, -1]]))
+
+# # フィルタリングした（畳み込んだ）結果を表示します。
+# plot.imshow(filtered_image)
+# plot.show()
+
+# # 3x3でフィルタリング（畳み込み）しますので、-1と+1できるように、元画像を1ドットずつ大きくします。
+# scaled_image = cv2.copyMakeBorder(image, 1, 1, 1, 1, cv2.BORDER_CONSTANT, 0)
+
+# # フィルタリング（畳み込み）先の画像を用意します。
+# filtered_image = np.zeros(image.shape)
+
+# w = [1, 0, -1, 1, 0, -1, 1, 0, -1]
+
+# # フィルタリング（畳み込み）。
+# for i in range(filtered_image.shape[0]):
+#     for j in range(filtered_image.shape[1]):
+#         x = np.reshape(scaled_image[i:i + 3, j:j + 3], (9,))
+#         filtered_image[i, j] = np.matmul(x, w)
+
+#         # y = i + 1  # フィルタリング（畳み込み）元の位置は、1ドット右になります。
+#         # x = j + 1  # フィルタリング（畳み込み）元の位置は、1ドット下になります。
+        
+#         # # 内積を求めて、フィルタリング（畳み込み）のドットを設定します。
+#         # filtered_image[i, j] = (scaled_image[y - 1, x - 1] * -1 +
+#         #                         scaled_image[y - 1, x    ] * -1 +
+#         #                         scaled_image[y - 1, x + 1] * -1 +
+#         #                         scaled_image[y    , x - 1] * -1 +
+#         #                         scaled_image[y    , x    ] *  8 +
+#         #                         scaled_image[y    , x + 1] * -1 +
+#         #                         scaled_image[y + 1, x - 1] * -1 +
+#         #                         scaled_image[y + 1, x    ] * -1 +
+#         #                         scaled_image[y + 1, x + 1] * -1)
+        
+# # 画像なので、0〜255の間に限定します。
+# filtered_image[filtered_image <   0] = 0
+# filtered_image[filtered_image > 255] = 255
+
+# # 表示します。
+# plot.imshow(filtered_image)
+# plot.show()
