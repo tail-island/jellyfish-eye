@@ -1,0 +1,6 @@
+#!/bin/sh
+
+for file in `\find $1 -name \*.pcd -print`; do
+  echo $file
+  pcl_viewer $file
+done
