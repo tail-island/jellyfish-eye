@@ -40,12 +40,12 @@ def load(data_path='./data'):
             return tuple(chain.from_iterable(map(rgbz, file)))
     
     def load_object(object_path):
-        return map(load_image, filter(lambda path: '.txt' in path, map(partial(os.path.join, object_path), os.listdir(object_path))))
+        return map(load_image, filter(lambda path: '.txt' in path, map(partial(os.path.join, object_path), sorted(os.listdir(object_path)))))
         
     def load_class(class_path):
-        return tuple(chain.from_iterable(map(load_object, map(partial(os.path.join, class_path), os.listdir(class_path)))))
+        return tuple(chain.from_iterable(map(load_object, map(partial(os.path.join, class_path), sorted(os.listdir(class_path))))))
 
     def train_and_test(images):
-        return images[20:], images[:20]
+        return images[25:], images[:25]
 
     return map(DataSet, zip(*map(train_and_test, map(load_class, map(partial(os.path.join, data_path), sorted(os.listdir(data_path)))))))
