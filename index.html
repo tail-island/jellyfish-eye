@@ -652,12 +652,13 @@ accuracy of validation data: <span class="fl">0.9911999702453613</span>
 accuracy of test data: <span class="fl">0.9919999837875366</span></code></pre></div>
 <p>テスト・データでの正解率が99%を超えて、99.2%になりました！　深層学習って、スゴイですな。</p>
 <h1>プログラムの作成</h1>
-<p>このようにスゴイ深層学習を、実際のプログラムで試してみたくなりませんか？　私は試してみたくなっちゃったので、今回は、ロボットに一般物体認識させるプログラムを作ってきました。せっかく作ってきたので、紹介させてください……。</p>
+<p>このようにスゴイ深層学習を、実際のプログラムで試してみたくなりませんか？　私は試してみたくなっちゃったので、今回は、ロボットに一般物体認識させるプログラムを作ってきました。</p>
+<p>で、その作ってきたソース・コードは、テンプレートとして使用できるんじゃないかなーと考えてています。本章で紹介するソース・コードを少しだけ修正すれば、皆様が深層学習でやりたいことを実現できるんじゃないかなーと。</p>
 <h2>ソース・コード</h2>
-<p>ソース・コードは<a href="https://github.com/tail-island/jellyfish-eye/">GitHub</a>で管理しています。<a href="https://git-for-windows.github.io/">Git for Windows</a>をセットアップして、以下のコマンドでダウンロードしてください。</p>
+<p>そんなことを言われても、現物を見なければ信用できない？　その通りですね。ソース・コードは<a href="https://github.com/tail-island/jellyfish-eye/">GitHub</a>で管理していますので、<a href="https://git-for-windows.github.io/">Git for Windows</a>をセットアップして、以下のコマンドでダウンロードしてみてください。</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="op">&gt;</span> <span class="bu">cd</span> TensorFlow  # 「2. インストール」で作成した、TensorFlow用の仮想環境
 <span class="op">&gt;</span> <span class="fu">git</span> clone https://github.com/tail-island/jellyfish-eye.git</code></pre></div>
-<p>プロジェクト名のjellyfish-eyeは、一部のクラゲは高機能な目を持っていて、脳がないにもかかわらず目で見た情報を処理して活用しているらしいことに由来しています。脳を持たないロボットがセンサーの情報にもとづいて自律行動しちゃうぜって感じですね。</p>
+<p>なお、プロジェクト名のjellyfish-eyeは、一部のクラゲは高機能な目を持っていて、脳がないにもかかわらず目で見た情報を処理して活用しているらしいことに由来しています。脳を持たないロボットがセンサーの情報にもとづいて自律行動しちゃうぜって感じですね。</p>
 <h2 id="python">Pythonのパッケージ</h2>
 <p>Pythonでは、ファイルがパッケージの単位になります。<code>./aaa.py</code>の中から<code>./bbb.py</code>に含まれる関数を使う際には、<code>import bbb</code>してあげなければならないわけですね。</p>
 <p>今回は、あとでコードを活用できるように、複数のファイルに分割しました。その際に、管理が楽になるように専用のパッケージを作成しています。<code>./xxx/ccc.py</code>のようにして、<code>import xxx.ccc</code>にしたわけですな。</p>
@@ -668,8 +669,7 @@ accuracy of test data: <span class="fl">0.9919999837875366</span></code></pre></
 <p>＊＊＊絵＊＊＊</p>
 <p>この深度センサーのデータを深層学習で処理して、ロボットの前に置かれたものが何かを回答することにしましょう（本稿では紹介しませんけど、実は、指定した物体の前まで移動するロボット用のプログラムも書いています。ロボットがモノを見分けるように見えて気持ち悪いデモをご覧になりたい場合は、声をかけてください）。</p>
 <p>ロボットの回答のレベルについても、考えなければなりません。というのも、「ギター」と回答するのか「平沢唯のギー太」と回答するのかで、難しさが変わってくるんですよ。「平沢唯のギー太」で学習して「平沢唯のギー太」を見つけるのは特定物体認識と呼ばれる技術で、実は簡単で面白くない。だから、「平沢唯のギー太」で学習して、学習データには含まれていなかった「中野梓のフェンダーJAPANのムスタング」についても「ギター」と答えてくれる、一般物体認識をやることにしましょう。</p>
-<p>というわけで、学習用データを作成しました。ロボットの上でプログラムを動かして、縦100ドット×横100ドット×(3原色＋距離)のデータを、「カレンダー」と「飲み物」、「ティッシュ・ペーパー」の3種類分、集めてきました（会社の机の周りにあった、適当なもの3種類です）。</p>
-<p>データの単位で、ファイルは分割されています（ファイルの拡張子は.txt）。そのファイルの1行は1ドットを表していて「赤<空白>青＜空白＞緑＜空白＞距離」となっています（それぞれのデータの範囲は、0.0〜1.0）。最初の行は左上のドット、次の行はその右のドットと続き、最も右下のドットまで、10000行続いています。</p>
+<p>以上で方針が決まりましたので、学習用のデータを作成しました。ロボットの上でプログラムを動かして、縦100ドット×横100ドット×(3原色＋距離)のデータを、「カレンダー」と「飲み物」、「ティッシュ・ペーパー」の3種類分、集めてきました（会社の机の周りにあった、適当なもの3種類です）。</p>
 <p>データを格納しているディレクトリーの構造は、以下の通り。</p>
 <pre><code>data
 ├── calendar
@@ -690,8 +690,137 @@ accuracy of test data: <span class="fl">0.9919999837875366</span></code></pre></
     ├── Kleenex_ハイクオリティ_フェイシャルティシュー
     ├── Kleenex_ローションティシュー_エックス
     └── エリエール_贅沢保湿</code></pre>
-<p>今回は一般物体認識なので、calendarやdrink、tissue-paperの単位でデータをまとめます。</p>
-<h2 id="jellyfish_eyedata_sets.py">jellyfish_eye\/data_sets.py</h2>
+<p>三階層目のディレクトリーの中に、それぞれの物体のデータが入ります。様々な角度から、1物体につき</p>
+<p>データの単位で、ファイルは分割されています（ファイルの拡張子は.txt）。そのファイルの1行は1ドットを表していて「赤<空白>青＜空白＞緑＜空白＞距離」となっています（それぞれのデータの範囲は、0.0〜1.0）。最初の行は左上のドット、次の行はその右のドットと続き、最も右下のドットまで、10000行続いています。</p>
+<h2 id="jellyfish_eyedata_sets.py">jellyfish_eye/data_sets.py</h2>
+<p>今回は独自のデータを使用していますから、前章のMNISTの場合のような便利クラスはありません。だから、データ管理のコードを作成しました。</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> os
+
+<span class="im">from</span> functools <span class="im">import</span> partial
+<span class="im">from</span> itertools <span class="im">import</span> chain, islice, repeat, starmap, tee
+
+
+<span class="co"># データ管理用のクラスです。</span>
+<span class="kw">class</span> DataSet:
+    <span class="co"># データをシャッフルします。</span>
+    <span class="kw">def</span> _shuffle(<span class="va">self</span>):
+        indice <span class="op">=</span> np.arange(<span class="bu">len</span>(<span class="va">self</span>.inputs))
+        np.random.shuffle(indice)
+
+        <span class="va">self</span>.inputs <span class="op">=</span> <span class="va">self</span>.inputs[indice]
+        <span class="va">self</span>.labels <span class="op">=</span> <span class="va">self</span>.labels[indice]
+
+    <span class="co"># コンストラクタ。inputs_collectionは、[[クラス0のデータ, クラス0のデータ...], [クラス1のデータ, クラス1のデータ], ...]としてください。</span>
+    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, inputs_collection):
+        <span class="va">self</span>.inputs <span class="op">=</span> np.array(<span class="bu">tuple</span>(chain.from_iterable(inputs_collection)))
+        <span class="va">self</span>.labels <span class="op">=</span> np.array(<span class="bu">tuple</span>(chain.from_iterable(starmap(<span class="kw">lambda</span> i, inputs: repeat(i, <span class="bu">len</span>(inputs)), <span class="bu">enumerate</span>(inputs_collection)))))
+
+        <span class="va">self</span>._shuffle()
+        <span class="va">self</span>._batch_index <span class="op">=</span> <span class="dv">0</span>
+
+    <span class="co"># バッチ学習用のデータを取得します。</span>
+    <span class="kw">def</span> next_batch(<span class="va">self</span>, batch_size):
+        <span class="cf">if</span> <span class="va">self</span>._batch_index <span class="op">+</span> batch_size <span class="op">&gt;</span> <span class="bu">len</span>(<span class="va">self</span>.inputs):
+            <span class="va">self</span>._shuffle()
+            <span class="va">self</span>._batch_index <span class="op">=</span> <span class="dv">0</span>
+
+        start <span class="op">=</span> <span class="va">self</span>._batch_index
+        end <span class="op">=</span> <span class="va">self</span>._batch_index <span class="op">=</span> <span class="va">self</span>._batch_index <span class="op">+</span> batch_size
+
+        <span class="cf">return</span> <span class="va">self</span>.inputs[start:end], <span class="va">self</span>.labels[start:end]
+
+
+<span class="co"># データを読み込みます。</span>
+<span class="kw">def</span> load(data_path<span class="op">=</span><span class="st">'./data'</span>):
+    <span class="co"># データを1行分、読み込みます。</span>
+    <span class="kw">def</span> rgbz(line_string):
+        <span class="co"># 赤と緑と青と距離に分割し、数値化します。</span>
+        <span class="cf">return</span> <span class="bu">map</span>(<span class="bu">float</span>, line_string.split())
+    
+    <span class="co"># データを1つ、読み込みます。</span>
+    <span class="kw">def</span> load_image(path):
+        <span class="co"># 一行ずつ読み込んで、chain.from_iterableでフラットにします。</span>
+        <span class="cf">with</span> <span class="bu">open</span>(path) <span class="im">as</span> <span class="bu">file</span>:
+            <span class="cf">return</span> <span class="bu">tuple</span>(chain.from_iterable(<span class="bu">map</span>(rgbz, <span class="bu">file</span>)))
+    
+    <span class="co"># 物体のデータを読み込みます。</span>
+    <span class="kw">def</span> load_object(object_path):
+        <span class="co"># 様々な角度からのデータを読み込みます。</span>
+        <span class="cf">return</span> <span class="bu">map</span>(load_image, <span class="bu">filter</span>(<span class="kw">lambda</span> path: <span class="st">'.txt'</span> <span class="kw">in</span> path, <span class="bu">map</span>(partial(os.path.join, object_path), <span class="bu">sorted</span>(os.listdir(object_path)))))
+        
+    <span class="co"># クラス（カレンダーや飲み物）を読み込みます。</span>
+    <span class="kw">def</span> load_class(class_path):
+        <span class="co"># 物体単位でデータを読み込んで、chain.from_iterableでフラットにします。</span>
+        <span class="cf">return</span> <span class="bu">tuple</span>(chain.from_iterable(<span class="bu">map</span>(load_object, <span class="bu">map</span>(partial(os.path.join, class_path), <span class="bu">sorted</span>(os.listdir(class_path))))))
+
+    <span class="co"># 訓練データとテスト・データに分割します。</span>
+    <span class="kw">def</span> train_and_test(images):
+        <span class="co"># 25番目以降を訓練データ、それより前をテスト・データとします。</span>
+        <span class="cf">return</span> images[<span class="dv">25</span>:], images[:<span class="dv">25</span>]
+
+    <span class="co"># クラス（カレンダーや飲み物）単位でデータを読み込んで、訓練データとテスト・データに分割し、データ・セットのクラスを生成します。</span>
+    <span class="cf">return</span> <span class="bu">map</span>(DataSet, <span class="bu">zip</span>(<span class="op">*</span><span class="bu">map</span>(train_and_test, <span class="bu">map</span>(load_class, <span class="bu">map</span>(partial(os.path.join, data_path), <span class="bu">sorted</span>(os.listdir(data_path)))))))</code></pre></div>
+<p>上半分の<code>class DataSet</code>は、深層学習を使う目的がクラス分類ならば、どのようなデータでも使えると思います。お好きにコピー＆ペーストしてみてください。<code>_shuffle()</code>等では、NumPyの機能をフルに使っています。</p>
+<p>下半分の<code>load()</code>は、対象データによって異なりますので、コピー＆ペーストは駄目。他のデータを扱う場合は、書き直さなければなりません。書き直しの負荷を減らすにはソース・コードの量を減らすのが有効で、そのためには関数型プログラミングが効く。というわけで、Pythonの公式文書の<a href="https://docs/python.jp/3/howto/functional.html">関数型プログラミング HOWTO</a>を読んで、関数型で書いてみました。<a href="https://docs/python.jp/3/howto/functional.html">関数型プログラミング HOWTO</a>は非常にわかりやすいので、一読すれば、上のコードのような感じに関数型プログラミングできます。</p>
+<h2 id="jellyfish_eyemodel.py">jellyfish_eye/model.py</h2>
+<p>次は、ニューラル・ネットワークを定義することにしましょう。以下がそのコード。</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> tensorflow <span class="im">as</span> tf
+
+<span class="im">from</span> jellyfish_eye.utilities <span class="im">import</span> summary_image, summary_image_collection, summary_scalar
+
+<span class="co"># 必要なplaceholderを定義します。</span>
+inputs <span class="op">=</span> tf.placeholder(tf.float32, (<span class="va">None</span>, <span class="dv">100</span> <span class="op">*</span> <span class="dv">100</span> <span class="op">*</span> <span class="dv">4</span>))
+labels <span class="op">=</span> tf.placeholder(tf.int32, (<span class="va">None</span>,))
+is_training <span class="op">=</span> tf.placeholder_with_default(<span class="va">False</span>, ())
+
+
+<span class="co"># TensorFlowのドキュメントに、ニューラル・ネットワークを作成する関数名はinference（推論）にしろと書いてありました。なのでinference()。</span>
+<span class="kw">def</span> inference():
+    <span class="co"># summary_image()とsummary_image_collection()は、次の項で説明します。ログを取ると思ってください。</span>
+
+    <span class="co"># 畳み込みできるように、データの形を変更します。</span>
+    outputs <span class="op">=</span> summary_image(<span class="st">'input'</span>, tf.reshape(inputs, (<span class="op">-</span><span class="dv">1</span>, <span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">4</span>)))
+    
+    <span class="co"># 畳み込みとプーリング（1層目）</span>
+    outputs <span class="op">=</span> summary_image_collection(<span class="st">'convolution-1'</span>, tf.contrib.layers.max_pool2d(tf.contrib.layers.conv2d(outputs, <span class="dv">32</span>, <span class="dv">10</span>), <span class="dv">2</span>))
+    
+    <span class="co"># 畳み込みとプーリング（2層目）</span>
+    outputs <span class="op">=</span> summary_image_collection(<span class="st">'convolution-2'</span>, tf.contrib.layers.max_pool2d(tf.contrib.layers.conv2d(outputs, <span class="dv">64</span>, <span class="dv">10</span>), <span class="dv">2</span>))
+    
+    <span class="co"># 全結合層で処理できるように、データの形を変更します。</span>
+    outputs <span class="op">=</span> tf.contrib.layers.flatten(outputs)
+    
+    <span class="co"># 全結合層。1024ニューロンと512ニューロンの2層。</span>
+    outputs <span class="op">=</span> tf.contrib.layers.stack(outputs, tf.contrib.layers.fully_connected, (<span class="dv">1024</span>, <span class="dv">512</span>))
+    
+    <span class="co"># ドロップアウト。</span>
+    outputs <span class="op">=</span> tf.contrib.layers.dropout(outputs, is_training<span class="op">=</span>is_training)
+
+    <span class="co"># 3クラスに分類します。</span>
+    <span class="cf">return</span> tf.contrib.layers.linear(outputs, <span class="dv">3</span>)
+
+
+<span class="co"># 損失関数。</span>
+<span class="kw">def</span> loss(logits):
+    <span class="co"># summary_scalarは、次の項で説明します。ログを取るんだと思ってください。</span>
+    
+    <span class="co"># クロス・エントロピーで、損失を計算します。</span>
+    <span class="cf">return</span> summary_scalar(<span class="st">'loss'</span>, tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits<span class="op">=</span>logits, labels<span class="op">=</span>labels)))
+
+
+<span class="co"># 訓練。</span>
+<span class="kw">def</span> train(loss):
+    <span class="co"># 学習率の設定が不要なAdamOptimizerを使用して訓練します。</span>
+    <span class="cf">return</span> tf.train.AdamOptimizer().minimize(loss)
+
+
+<span class="co"># 精度。</span>
+<span class="kw">def</span> accuracy(logits):
+    <span class="cf">return</span> tf.reduce_mean(tf.cast(tf.nn.in_top_k(logits, labels, <span class="dv">1</span>), tf.float32))</code></pre></div>
+<p>前章でやった畳み込みニューラル・ネットワークのコードから、ニューラル・ネットに関係する部分を抜き出して、関数化しただけですね。</p>
+<p>これらの処理を別パッケージに抜き出した理由は、変更が多い部分を局所化するためです。深層学習してみたのだけど精度が低いという場合は、ニューラル・ネットワークをチューニングしなければなりません。で、チューニングで何をするかというと、<code>max_pool2d()</code>や<code>conv2d()</code>、<code>fully_connected()</code>の引数を変更することになります。畳み込みで出力されるチャンネル数を増やしたりとかね。あと、畳込み層を増やしちゃうなんてのもよくやります。これらのチューニング作業が、この<code>model.py</code>の修正だけで済むわけ。</p>
+<h2 id="jellyfish_eyeutilities.py">jellyfish_eye/utilities.py</h2>
 <section class="footnotes">
 <hr />
 <ol>
