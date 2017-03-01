@@ -5,13 +5,13 @@ import tensorflow as tf
 
 train_data_set, test_data_set = data_sets.load()
 
-inputs = tf.placeholder(tf.float32, (None, 100 * 100 * 4))
-labels = tf.placeholder(tf.int32, (None,))
-is_training = tf.placeholder_with_default(False, ())
+inputs = model.inputs
+labels = model.labels
+is_training = model.is_training
 
-logits = model.inference(inputs, is_training)
-train = model.train(model.loss(logits, labels))
-accuracy = model.accuracy(logits, labels)
+logits = model.inference()
+train = model.train(model.loss(logits))
+accuracy = model.accuracy(logits)
 
 global_step = tf.contrib.framework.get_or_create_global_step()
 inc_global_step = tf.assign(global_step, tf.add(global_step, 1))
