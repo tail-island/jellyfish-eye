@@ -20,7 +20,7 @@ Webブラウザーで[https://www.python.org/](https://www.python.org/)を開き
 
 ![www.python.org](images/installing-python-1.png)
 
-2017年2月現在のTensorFlow（バージョンは0.12.1）は、Windows環境では3.5.xの64bit環境しかサポートしませんから、3.5.xの中で最新の[Python 3.5.3 - 2017-01-17]の下の[Windows x86-64 executable installer]をクリックして、ダウンロードしました。
+2017年3月現在のTensorFlow（バージョンは1.0）は、Windows環境ではPythonの3.5.xしかサポートしませんから、3.5.xの中で最新の[Python 3.5.3 - 2017-01-17]の下の[Windows x86-64 executable installer]をクリックして、ダウンロードしました。
 
 ![www.python.org](images/installing-python-2.png)
 
