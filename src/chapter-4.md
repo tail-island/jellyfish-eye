@@ -261,19 +261,19 @@ def summary_scalar(name, variable):
 
 ……えっと、サマリー関連だけですな。ユーティリティーが少ないのは、私が手を抜いたからではなく、TensorFlowの完成度が高いためです。
 
-さて、`summary_image()`や`summary_image_collection()`するとTensorFlowの可視化ツールであるTensorBoardで、深層学習がどのように働くのかを以下のような形で見る事ができます。
+さて、`summary_image()`や`summary_image_collection()`すると、TensorFlowの可視化ツールであるTensorBoardを通じて、深層学習がどのように働くのかを以下のような形で見る事ができます。
 
 ![summary\_image()](images/tensorboard-summary-image.png "summary_image()しているので、入力データを可視化できました。")
 
 ![summary\_image\_collection()](images/tensorboard-summary-image-collection.png "summary_image_collection()しているので、畳み込みの結果を可視化できました。タイル状に並んだ画像がいい感じに異なっていれば、学習が進んだと判断できます。")
 
-前項のように損失関数を`summary_scalar()`しておけば、値がどのように変化したのかが、以下のようにグラフで見ることができます。
+前項のコードのように損失関数を`summary_scalar()`しておけば、値がどのように変化したのかが、以下のようにグラフで見ることができます。
 
 ![summary\_scalar()](images/tensorboard-summary-scalar.png "summary_scalar()しているので、損失関数の値の変化を可視化できました。0に近づいているので、学習は進んでいると考えられます。")
 
 ## jellyfish\_eye/train.py
 
-以上で、道具が揃いましたから、深層学習させるコードを書きましょう。
+以上で道具が揃いましたから、深層学習させるコードを書きましょう。
 
 ```python
 import jellyfish_eye.data_sets as data_sets
@@ -330,7 +330,7 @@ with supervisor.managed_session() as session:
 
 というわけで、`tf.train.Supervisor`を使いましょう。`Supervisor`を使うと、学習したモデルを`save_model_secs`で指定したタイミングで保存してくれます。そして、`Supervisor`経由でセッションを取得すれば、最新の学習結果（`logs/checkpoint`というファイルの中で指定すれば、最新でなくても可）で初期化されたモデルが手に入ります。これなら、保存された学習結果を活用するサービスを作れますし、学習の途中で中断して、その後に再開することもできます。サマリーも`save_summaries_secs`で指定した間隔で保存してくれますから、前述したモデルの中でサマリーに追加した様々な情報を可視化できます。
 
-たしかに、`Supervisor`を使うには`global_step`の作成が必要だったり、`global_step`をインクリメントする処理が必要だったり、`summary_op=None`しておかないと`feed_dict`が必要なサマリーは使えなかったりと、少し面倒なところはあります。でも、その面倒は、上のコードをコピー＆ペーストすればゼロになって利点だけが残る。対象データやニューラル・ネットワークの内容が異なっても訓練のやり方は変わりませんから、上のコードの`import`する名前空間を変更するだけで、皆様のプロジェクトでも使えると思いますよ。
+この`Supervisor`を使うには`global_step`の作成が必要だったり、`global_step`をインクリメントする処理が必要だったり、`summary_op=None`しておかないと`feed_dict`が必要なサマリーは使えなかったりと、少し面倒なところはあります。でも、その面倒は、上のコードをコピー＆ペーストすればゼロになって利点のみが残る。対象データやニューラル・ネットワークの内容が異なっても訓練のやり方は変わりませんから、上のコードの`import`する名前空間を変更するだけで、このコードは皆様のプロジェクトでも使えると思いますよ。
 
 ##jellyfish\_eye/serve.py
 
@@ -383,7 +383,7 @@ if __name__ == '__main__':
 
 前項で紹介した`Supervisor`を使えば、サービスの提供も簡単に実現できます。セッション取得のための時間を節約するために、managed_session()ではなくPrepareSession()するところに注意するだけ。あとは、バッチ学習じゃないので、`input`から`inputs`に変換するために形を変換する程度。上のコードの上半分をコピー＆ペーストすれば、ほとんどのプロジェクトで使えると思いますよ。
 
-なお、このコードは、以下のようにして他のパッケージから深層学習の結果を利用することを想定しています。
+なお、このコードは、以下のようにして他のパッケージから利用されることを想定しています。
 
 ```python
 import jellyfish_eye.serve
