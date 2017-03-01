@@ -410,13 +410,7 @@ if jellyfish_eye.serve(image).indices[0][0] == 0:  # ディレクトリの名前
 
 なお、GPUを積んでいない私の4年前のおんぼろラップトップPCだとここまで訓練するのに1*時間*くらいかかりましたが、NvidiaのGeForce GTX 980 Tiという1年前に10万円で買ったGPUを積んだPCで実験してみたら、たった1*分*で終わっちゃいました……。2017年3月現在なら980より圧倒的に速いというGeForce GTX 1080が8万円くらいで買えますから、もし深層学習に興味を持ったならGPUの購入をおすすめします。
 
-あと、学習している間が暇だなーと感じるようでしたら、TensorFlowのツールであるTensorBoardで学習内容を可視化してみてください。TensorBoardの実行は、`tesnsorboard --logdir=logs`です。TensorBoardが起動したら、Webブラウザを開いてURLに`localhost:6006`と入れればオッケー。こうすると、前の項で見ていただいたような畳込み結果や入力画像を見られたり、損失関数がどんどん減っている（学習がどんどん進んでいる）ことが分かるので、あまり退屈しないで済みます。
-
-![summary\_image()](images/tensorboard-summary-image.png)
-
-![summary\_image\_collection()](images/tensorboard-summary-image-collection.png)
-
-![summary\_scalar()](images/tensorboard-summary-scalar.png)
+あと、学習している間が暇だなーと感じるようでしたら、TensorFlowのツールであるTensorBoardで学習内容を可視化してみてください。TensorBoardは、コマンドラインから`tesnsorboard --logdir=logs`と入力すれば起動できます。コマンドライン上でTensorBoardが起動したら、Webブラウザを開いてURLに`localhost:6006`と入れればオッケー。こうすると、前の項で見ていただいたような畳込み結果や入力画像を見られたり、損失関数がどんどん減っている（学習がどんどん進んでいる）ことが分かるので、あまり退屈しないで済みます。
 
 さて、訓練が終わったので、その結果をサービス化してみると……
 
