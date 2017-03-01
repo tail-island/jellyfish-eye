@@ -265,12 +265,11 @@ def summary_scalar(name, variable):
 
 ![summary\_image()](images/tensorboard-summary-image.png "summary_image()しているので、入力データを可視化できました。")
 
-
-![summary\_image\_collection()](images/tensorboard-summary-image-collection.png "`summary_image_collection()`しているので、畳み込みの結果を可視化できました。タイル状に並んだ画像がいい感じに異なっていれば、学習が進んだと判断できます。")
+![summary\_image\_collection()](images/tensorboard-summary-image-collection.png "summary_image_collection()しているので、畳み込みの結果を可視化できました。タイル状に並んだ画像がいい感じに異なっていれば、学習が進んだと判断できます。")
 
 前項のように損失関数を`summary_scalar()`しておけば、値がどのように変化したのかが、以下のようにグラフで見ることができます。
 
-![summary\_scalar()](images/tensorboard-summary-scalar.png "`summary_scalar()`しているので、損失関数の値の変化を可視化できました。0に近づいているので、学習は進んでいると考えられます。")
+![summary\_scalar()](images/tensorboard-summary-scalar.png "summary_scalar()しているので、損失関数の値の変化を可視化できました。0に近づいているので、学習は進んでいると考えられます。")
 
 ## jellyfish\_eye/train.py
 
@@ -403,13 +402,13 @@ if jellyfish_eye.serve(image).indices[0][0] == 0:  # ディレクトリの名前
 
 以上で、全てのコードが完成です。さっそく実行してみましょう。Pythonでパッケージ名を指定して実行するときは`python -m <パッケージ名>`とします。今回のコードの場合は、訓練したいなら`python -m jellyfish_eye.train`、サービスを提供するなら`python -m jellyfish_eye.serve`となります。
 
-深層学習の結果は……
+さて、注目の深層学習の結果は……
 
 ![jellyfish-eye.train](images/jellyfish-eye-train-result.png)
 
 うん、精度が80%を超えました！　かなり良いんじゃないでしょうか？
 
-なお、GPUを積んでいない私の4年前のおんぼろコンピューターだとここまで訓練するのに1*時間*くらいかかりましたが、NvidiaのGeForce GTX 980 Tiという1年前に10万円で買ったGPUを積んだコンピューターで実験してみたら、たった1*分*で終わっちゃいました……。2017年3月現在なら980より圧倒的に速いというGeForce GTX 1080が8万円くらいで買えますから、もし深層学習に興味を持ったならGPUの購入をおすすめします。
+なお、GPUを積んでいない私の4年前のおんぼろラップトップPCだとここまで訓練するのに1*時間*くらいかかりましたが、NvidiaのGeForce GTX 980 Tiという1年前に10万円で買ったGPUを積んだPCで実験してみたら、たった1*分*で終わっちゃいました……。2017年3月現在なら980より圧倒的に速いというGeForce GTX 1080が8万円くらいで買えますから、もし深層学習に興味を持ったならGPUの購入をおすすめします。
 
 あと、学習している間が暇だなーと感じるようでしたら、TensorFlowのツールであるTensorBoardで学習内容を可視化してみてください。TensorBoardの実行は、`tesnsorboard --logdir=logs`です。TensorBoardが起動したら、Webブラウザを開いてURLに`localhost:6006`と入れればオッケー。こうすると、前の項で見ていただいたような畳込み結果や入力画像を見られたり、損失関数がどんどん減っている（学習がどんどん進んでいる）ことが分かるので、あまり退屈しないで済みます。
 
@@ -423,4 +422,4 @@ if jellyfish_eye.serve(image).indices[0][0] == 0:  # ディレクトリの名前
 
 ![jellyfish-eye.serve](images/jellyfish-eye-serve-result.png)
 
-うん、正しく実行できていますね（左半分のガタガタの絵は、距離を透明度に変換して画像化した入力データです）。深層学習の「学習」には時間がかかりますけど、深層学習した結果を実行するだけなら、GPUなしでもかなり速いです。一回の判断に0.067秒しかかかっていないんですからね。これなら、私のロボットに積んでいるRaspberry Piでも、なんとか実行できそうですな。
+うん、正しく判別できていますね（左半分のガタガタの絵は、距離を透明度に変換して画像化した入力データです）。深層学習の「学習」には時間がかかりますけど、深層学習した結果を実行するだけなら、GPUなしでもかなり速いです。一回の判断に0.067秒しかかかっていないんですからね。これなら、私のロボットに積んでいるRaspberry Piでも、なんとか実行できそうですな。
