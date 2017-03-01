@@ -2,9 +2,9 @@
 
 このようにスゴイ深層学習を、実際のプログラムで試してみたくなりませんか？　私は試してみたくなっちゃったので、今回は、ロボットに一般物体認識させるプログラムを作ってきました。
 
-で、その作ってきたソース・コードは、テンプレートとして使用できるんじゃないかなーと考えてています。本章で紹介するソース・コードを少しだけ修正すれば、皆様が深層学習でやりたいことを実現できるんじゃないかなーと。
+で、その作ってきたソース・コードは、皆様が深層学習するときのテンプレートとして使用できるんじゃないかなーと考えてています。本章で紹介するソース・コードを少し修正するだけで、皆様が深層学習でやりたいことを実現できるんじゃないかなーと。
 
-## ソース・コード
+## ソース・コードの取得方法
 
 そんなことを言われても、現物を見なければ信用できない？　その通りですね。ソース・コードは[GitHub](https://github.com/tail-island/jellyfish-eye/)で管理していますので、[Git for Windows](https://git-for-windows.github.io/)をセットアップして、以下のコマンドでダウンロードしてみてください。
 
@@ -19,7 +19,7 @@
 
 Pythonでは、ファイルがパッケージの単位になります。`./aaa.py`の中から`./bbb.py`に含まれる関数を使う際には、`import bbb`してあげなければならないわけですね。
 
-今回は、あとでコードを活用できるように、複数のファイルに分割しました。その際に、管理が楽になるように専用のパッケージを作成しています。`./xxx/ccc.py`のようにして、`import xxx.ccc`にしたわけですな。
+今回は、あとでコードを活用できるように、複数のファイルに分割しました。その際に、管理が楽になるように専用のパッケージを作成しています。`./xxx/ccc.py`のようにプログラム・ファイルをディレクトリの下に配置して、`import xxx.ccc`にしたわけですな。
 
 このパッケージ名（ディレクトリ名）は、Pythonの文法に合うようにプロジェクト名の`-`を`_`に置換して、`jellyfish_eye`としました。
 
@@ -33,11 +33,11 @@ Pythonでは、ファイルがパッケージの単位になります。`./aaa.p
 
 ＊＊＊絵＊＊＊
 
-この深度センサーのデータを深層学習で処理して、ロボットの前に置かれたものが何かを回答することにしましょう（本稿では紹介しませんけど、実は、指定した物体の前まで移動するロボット用のプログラムも書いています。ロボットがモノを見分けるように見えて気持ち悪いデモをご覧になりたい場合は、声をかけてください）。
+この深度センサーのデータを深層学習で処理して、ロボットの前に置かれたものが何かを回答することにしましょう（本稿では紹介しませんけど、実は、指定した物体の前まで移動するロボット用のプログラムも書いています。ロボットがモノを見分けるように見えて少し不気味なデモをご覧になりたい場合は、声をかけてください）。
 
 ロボットの回答のレベルについても、考えなければなりません。というのも、「ギター」と回答するのか「平沢唯のギー太」と回答するのかで、難しさが変わってくるんですよ。「平沢唯のギー太」で学習して「平沢唯のギー太」を見つけるのは特定物体認識と呼ばれる技術で、実は簡単で面白くない。だから、「平沢唯のギー太」で学習して、学習データには含まれていなかった「中野梓のフェンダーJAPANのムスタング」についても「ギター」と答えてくれる、一般物体認識をやることにしましょう。
 
-以上で方針が決まりましたので、学習用のデータを作成しました。ロボットの上でプログラムを動かして、縦100ドット×横100ドット×(3原色＋距離)のデータを、「カレンダー」と「飲み物」、「ティッシュ・ペーパー」の3種類分、集めてきました（会社の机の周りにあった、適当なもの3種類です）。
+以上で方針が決まりましたので、学習用のデータを作成しました。ロボットの上でプログラムを動かして、縦100ドット×横100ドット×(3原色＋距離)のデータを、「カレンダー」と「飲み物」、「ティッシュ・ペーパー」の3種類分、集めてきました（会社の机の周りにあった、適当なモノを3種類です）。
 
 データを格納しているディレクトリーの構造は、以下の通り。
 
@@ -63,13 +63,13 @@ data
     └── エリエール_贅沢保湿
 ```
 
-三階層目のディレクトリーの中に、それぞれの物体のデータが入ります。様々な角度から、1物体につき
+三階層目のディレクトリーの中に、それぞれの物体のデータが入ります。様々な角度から、1物体につき複数のデータを採取しています。
 
 データの単位で、ファイルは分割されています（ファイルの拡張子は.txt）。そのファイルの1行は1ドットを表していて「赤<空白>青＜空白＞緑＜空白＞距離」となっています（それぞれのデータの範囲は、0.0〜1.0）。最初の行は左上のドット、次の行はその右のドットと続き、最も右下のドットまで、10000行続いています。
 
 ## jellyfish\_eye/data\_sets.py
 
-今回は独自のデータを使用していますから、前章のMNISTの場合のような便利クラスはありません。だから、データ管理のコードを作成しました。
+今回は独自のデータを使用していますから、前章のMNISTの場合のような便利クラスはありません。ですから、データ管理のコードを作成しました。
 
 ```python
 import numpy as np
@@ -134,16 +134,16 @@ def load(data_path='./data'):
 
     # 訓練データとテスト・データに分割します。
     def train_and_test(images):
-        # 25番目以降を訓練データ、それより前をテスト・データとします。
-        return images[25:], images[:25]
+        # 20番目以降を訓練データ、それより前をテスト・データとします。
+        return images[20:], images[:20]
 
     # クラス（カレンダーや飲み物）単位でデータを読み込んで、訓練データとテスト・データに分割し、データ・セットのクラスを生成します。
     return map(DataSet, zip(*map(train_and_test, map(load_class, map(partial(os.path.join, data_path), sorted(os.listdir(data_path)))))))
 ```
 
-上半分の`class DataSet`は、深層学習を使う目的がクラス分類ならば、どのようなデータでも使えると思います。お好きにコピー＆ペーストしてみてください。`_shuffle()`等では、NumPyの機能をフルに使っています。
+上半分の`class DataSet`は、深層学習を使う目的がクラス分類ならば、どのようなデータでも使えると思います。お好きにコピー＆ペーストしてみてください。`_shuffle()`等でNumPyの面白機能を使っていて、NumPyの奥深さを味わえますな。
 
-下半分の`load()`は、対象データによって異なりますので、コピー＆ペーストは駄目。他のデータを扱う場合は、書き直さなければなりません。書き直しの負荷を減らすにはソース・コードの量を減らすのが有効で、そのためには関数型プログラミングが効く。というわけで、Pythonの公式文書の[関数型プログラミング HOWTO](https://docs/python.jp/3/howto/functional.html)を読んで、関数型で書いてみました。[関数型プログラミング HOWTO](https://docs/python.jp/3/howto/functional.html)は非常にわかりやすいので、一読すれば、上のコードのような感じに関数型プログラミングできます。
+下半分の`load()`は、対象データが異なれば、書き直しになるでしょう。その書き直しの負荷を減らすにはソース・コードの量を減らすのが有効で、そのためには関数型プログラミングが効く。だから、Pythonの公式文書の[関数型プログラミング HOWTO](https://docs/python.jp/3/howto/functional.html)を読んで、関数型で書いてみました。[関数型プログラミング HOWTO](https://docs/python.jp/3/howto/functional.html)は非常にわかりやすいので、一読すれば、上のコードのような感じに関数型プログラミングでコード量を削減できますよ。あと、今回は採取できたデータ量が少なかったので、訓練用とテスト用の2つのデータ・セットしか使用しないことにしました。
 
 ## jellyfish\_eye/model.py
 
@@ -205,9 +205,213 @@ def accuracy(logits):
     return tf.reduce_mean(tf.cast(tf.nn.in_top_k(logits, labels, 1), tf.float32))
 ```
 
-前章でやった畳み込みニューラル・ネットワークのコードから、ニューラル・ネットに関係する部分を抜き出して、関数化しただけですね。
+前章でやった畳み込みニューラル・ネットワークのコードから、ニューラル・ネットに関係する部分を抜き出して、関数化しただけです。
 
-で、これらの処理を別パッケージに抜き出した理由は、変更が多い部分を局所化するためです。深層学習してみたのだけど精度が低いという場合は、ニューラル・ネットワークをチューニングしなければなりません。で、チューニングで何をするかというと、`max_pool2d()`や`conv2d()`、`fully_connected()`の引数を変更することになります。畳み込みで出力されるチャンネル数を増やしたりとかね。あと、畳込み層を増やしちゃうなんてのもよくやります。これらのチューニング作業が、この`model.py`の修正だけで済むというわけ。
+で、これらの処理をわざわざ別のパッケージに抜き出した理由は、変更が多い部分を局所化するためです。深層学習してみたのだけど精度が低いという場合は、ニューラル・ネットワークをチューニングしなければなりません。で、チューニングでは何をするかというと、`max_pool2d()`や`conv2d()`、`fully_connected()`の引数を変更することになります。畳み込みで出力されるチャンネル数を増やしたりとかね。あとは、畳込み層を増やすなんてのも、よくやります。これらのチューニング作業が、この`model.py`の修正だけで済むというわけ。
 
 ## jellyfish\_eye/utilities.py
 
+さて、TensorFlowはとても良くできているのですけど、でも、痒いところ全てに手が届くような環境ではありません。あと、Python流のやり方の中には、[関数型プログラミング HOWTO](https://docs/python.jp/3/howto/functional.html)を熟読しちゃって関数型になった後だと気持ち悪く感じるものもあります。
+
+というわけで、ユーティリティーをいくつか作ってきました。
+
+```python
+import tensorflow as tf
+
+
+# 画像をTensorBoardで確認できるようにするために、サマリーに追加します。
+def summary_image(name, variable):
+    # 一つ目の画像だけを抜き出して、サマリーに追加します。
+    tf.summary.image(name, tf.slice(variable, (0, 0, 0, 0), (1, -1, -1, -1)))
+
+    # 呼び出し時に一時変数を作らなくて済むようにするために、variableをリターンしておきます。関数型だと、一時変数は気持ち悪い。
+    return variable
+
+
+# 畳み込み後のような複数のチャンネルに別れた画像を、タイル状に並べてサマリーに追加します。
+def summary_image_collection(name, variable):
+    # 画像の高さ、幅、タイル状に並べる際の行と幅を取得します。
+    h = tf.shape(variable)[1]
+    w = tf.shape(variable)[2]
+    r = tf.shape(variable)[3] // 8  # 畳込みの出力チャンネル数は、8の倍数にしてください……。
+    c = 8
+
+    # 一つ目の画像を、チャンネル単位にタイル状に並べます。
+    image = tf.slice(variable, (0, 0, 0, 0), (1, -1, -1, -1))
+    image = tf.reshape(image, (h, w, r, c))
+    image = tf.transpose(image, (2, 0, 3, 1))
+    image = tf.image.adjust_contrast(image, 1)
+    image = tf.reshape(image, (1, r * h, c * w, 1))
+
+    # サマリーに追加します。
+    tf.summary.image(name, image)
+
+    # 呼び出し時に一時変数を作らなくて済むようにするために、variableをリターンしておきます。
+    return variable
+
+
+# スカラー（1.0や'abc'などの、単一の値）を、サマリーに追加します。
+def summary_scalar(name, variable):
+    # サマリーに追加します。
+    tf.summary.scalar(name, variable)
+
+    # 呼び出し時に一時変数を作らなくて済むようにするために、variableをリターンしておきます。
+    return variable
+```
+
+……えっと、サマリー関連だけですな。ユーティリティーが少ないのは、私が手を抜いたからではなく、TensorFlowの完成度が高いためです。
+
+さて、`summary_image()`や`summary_image_collection()`するとTensorFlowの可視化ツールであるTensorBoardで、深層学習がどのように働くのかを以下のような形で見る事ができます。
+
+＊＊＊絵＊＊＊
+
+前項のように損失関数を`summary_scalar()`しておけば、値がどのように変化したのかが、以下のようにグラフで見ることができます。
+
+＊＊＊絵＊＊＊
+
+## jellyfish\_eye/train.py
+
+以上で、道具が揃いましたから、深層学習させるコードを書きましょう。
+
+```python
+import jellyfish_eye.data_sets as data_sets
+import jellyfish_eye.model as model
+import tensorflow as tf
+
+
+# 学習用データを取得します。
+train_data_set, test_data_set = data_sets.load()
+
+# モデルで定義したplaceholderを取得します。
+inputs = model.inputs
+labels = model.labels
+is_training = model.is_training
+
+# ニューラル・ネットワークを定義します。
+logits = model.inference()
+train = model.train(model.loss(logits))
+accuracy = model.accuracy(logits)
+
+# 学習に必要な環境を整えます。
+global_step = tf.contrib.framework.get_or_create_global_step()  # 何ステップ目の学習なのかを表現します。
+inc_global_step = tf.assign(global_step, tf.add(global_step, 1))  # global_stepに1を足してインクリメントします。
+summary = tf.summary.merge_all()  # TensorBoardへの出力をまとめます。
+supervisor = tf.train.Supervisor(logdir='logs', save_model_secs=60, save_summaries_secs=60, summary_op=None)  # 学習全体を管理します。
+
+# Supervisor経由で、セッションを取得します。
+with supervisor.managed_session() as session:
+    # Supervisorが問題を検出しなければ、学習を繰り返します。
+    while not supervisor.should_stop():
+        # グローバル・ステップの値を取得します。
+        global_step_value = session.run(global_step)
+
+        # バッチ学習で、ニューラル・ネットワークを訓練します。
+        train_inputs, train_labels = train_data_set.next_batch(20)
+        session.run(train, feed_dict={inputs: train_inputs, labels: train_labels, is_training: True})
+
+        # 一定のタイミングで、サマリーを取得したり、精度を出力したりします。
+        if global_step_value % 10 == 0:
+            # サマリーを取得します。
+            supervisor.summary_computed(session, session.run(summary, feed_dict={inputs: train_inputs, labels: train_labels, is_training: True}))
+
+            # 精度を出力します。
+            print('global step {0:>4d}: train accuracy = {1:.4f}, test accuracy = {2:.4f}.'.format(
+                global_step_value,
+                session.run(accuracy, feed_dict={inputs: train_inputs, labels: train_labels}),
+                session.run(accuracy, feed_dict={inputs: test_data_set.inputs, labels: test_data_set.labels})))
+
+        # グローバル・ステップをインクリメントします。
+        session.run(inc_global_step)
+```
+
+学習するだけなら、前章のコードのような簡単なものでも良いのですけど、学習して終わりじゃあ意味がないですよね？　学習した結果を活用して、サービスを作らないとね。あと、学習の途中でコンピューターが落ちたら最初からやり直しではキツイので、途中から学習を再開できる仕組みも必要です。学習が良い感じに進んでいるかどうか、目で見て確認もしたいですね。
+
+というわけで、`tf.train.Supervisor`を使いましょう。`Supervisor`を使うと、学習したモデルを`save_model_secs`で指定したタイミングで保存してくれます。そして、`Supervisor`経由でセッションを取得すれば、最新の学習結果（`logs/checkpoint`というファイルの中で指定すれば、最新でなくても可）で初期化されたモデルが手に入ります。これなら、保存された学習結果を活用するサービスを作れますし、学習の途中で中断して、その後に再開することもできます。サマリーも`save_summaries_secs`で指定した間隔で保存してくれますから、前述したモデルの中でサマリーに追加した情報を見ることもできます。
+
+たしかに、`Supervisor`を使うには`global_step`の作成が必要だったり、`global_step`をインクリメントする処理が必要だったり、`summary_op=None`しておかないと`feed_dict`が必要なサマリーは使えなかったりとか、少し面倒なところはあります。でも、その面倒は、上のコードをコピー＆ペーストすればゼロにできます。対象データやニューラル・ネットワークの内容が異なっても訓練のやり方は変わらないので、上のコードの`import`する名前空間を変更するだけで、皆様のプロジェクトでも使えると思いますよ。
+
+##jellyfish\_eye/serve.py
+
+ついでですから、サービス化の前準備もしてしまいましょう。深層学習した結果を活用して、物体が何なのかを判断する関数を作成します。
+
+```python
+import jellyfish_eye.model as model
+import numpy as np
+import tensorflow as tf
+
+
+# モデルで定義したplaceholderを取得します。
+inputs = model.inputs
+
+# ニューラル・ネットワークを定義します。確率で表現したいので、tf.nn.softmaxをtf.nn.top_kとinferenceの間に入れます。
+top_k = tf.nn.top_k(tf.nn.softmax(model.inference()), k=3)
+
+# サービスに必要な環境を整えます。
+supervisor = tf.train.Supervisor(logdir='logs', save_model_secs=0, save_summaries_secs=0)
+session = supervisor.PrepareSession()  # セッションを使いまわしたいので、managed_sessionではなくてPrepareSession()。なんで大文字なんだろ？
+
+
+# クラスを判断します。
+def classify(input):
+    return session.run(top_k, feed_dict={inputs: np.array((input,))})
+
+
+# ダミーの実行モジュール。削除しても構いません。
+if __name__ == '__main__':
+    import jellyfish_eye.data_sets as data_sets
+    import matplotlib.pyplot as plot
+    import time
+
+    _, test_data_set = data_sets.load()
+    classes = []
+
+    starting_time = time.time()
+    for input in test_data_set.inputs:
+        classes.append(classify(input))
+    finishing_time = time.time()
+
+    for input, label, class_ in zip(test_data_set.inputs, test_data_set.labels, classes):
+        print('{0} : {1}, {2}'.format(label, class_.indices[0][0], tuple(zip(class_.indices[0], class_.values[0]))))
+        
+        plot.imshow(np.reshape(input, (100, 100, 4)))
+        plot.show()
+        
+    print('Elapsed time: {0:.4f} sec'.format((finishing_time - starting_time) / len(test_data_set.inputs)))
+```
+
+前項で紹介した`Supervisor`を使えば、サービスの提供も簡単です。セッション取得のための時間を節約するために、managed_session()ではなくPrepareSession()するところに注意するだけ。あとは、バッチ学習じゃないので、`input`から`inputs`に変換するために形を変換する程度。こっちも、上のコードの上半分をコピー＆ペーストすれば大丈夫だと思いますよ。
+
+このコードがあれば、以下のようにして他のパッケージから深層学習の結果を利用することができます。
+
+```python
+import jellyfish_eye.serve
+
+...
+
+image = ...  # 深度センサーからデータを取得。
+
+if jellyfish_eye.serve(image).indices[0][0] == 0:  # ディレクトリの名前順でクラスを決めたので、0がcalendarで1がdrink、2がtissue-paper。
+  # カレンダーが前に置かれたので、予定をチェックする等の処理を実行する。
+```
+
+## 実行
+
+以上で全てのコードが完成したので、実行してみましょう。Pythonでパッケージ名を指定して実行するときは`python -m <パッケージ名>`とします。今回のコードの場合は、訓練したいなら`python -m jellyfish_eye.train`、サービスを提供するなら`python -m jellyfish_eye.serve`となります。
+
+深層学習の結果は……
+
+＊＊＊絵＊＊＊
+
+うん、精度が90%を超えました！　かなり良いんじゃないでしょうか？
+
+なお、GPUが無い私のコンピューターだとここまで訓練するのにxx分くらいかかりましたが、GeForce 980Tiという型遅れの10万円のGPUを積んだコンピューターで実験してみたら、yy分で終わりました。2017年3月現在なら980Tiよりももっと性能がよい1080が8万円程度で買えますから、もし深層学習に興味を持ったならGPUを買うことをおすすめします。
+
+あと、学習している間は暇だなーと感じるようでしたら、TensorFlowのツールであるTensorBoardで学習内容を可視化してみてください。TensorBoardの実行は、`tesnsorboard --logdir=logs`です。TensorBoardが起動したら、Webブラウザを開いてURLに`localhost:6006`と入れればオッケー。こうすると、前の項で見ていただいたような畳込み結果や入力画像を見られたり、損失関数がどんどん減っている（学習がどんどん進んでいる）ことが分かるので、あまり退屈しないで済みます。
+
+＊＊＊絵＊＊＊
+
+さて、訓練が終わったので、その結果をサービス化してみると……
+
+＊＊＊絵＊＊＊
+
+うん、正しく実行できていますね。深層学習の「学習」には時間がかかりますけど、深層学習した結果を実行するだけなら、GPUなしでもかなり速いです。一回の判断に0.076秒しかかかっていないんですからね。これなら、私のロボットに積んでいるRaspberry Piでも実行できそうです。

@@ -57,8 +57,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>TensorFlowやChainerといったライブラリが抽象化してくれるため、詳細（難しい数式等）を理解していなくても使える。</li>
 <li>汎用性が高いため、いわゆる統計処理や機械学習のような複数のアルゴリズムの使い分けが不要。必要な前提知識が少なくて済む。</li>
 </ol>
-<p>もし嘘だと思うなら、「2. インストール」の記述に従ってTensorFlowをインストールして、「4. プログラムの作成」で作成する深度センサーのデータからの一般物体認識プログラムを実行してみてください。簡単（数式はゼロ！）な短い（全部で100行！）プログラムなのに、深度センサーの前に置かれたものが何なのかを高い精度（90%以上！）で答えてくれます。</p>
-<p>深層学習がどのように動作するのかは、「3. 深層学習の仕組み」でに述べます。ここを読めば、「5. その他のプログラム」で述べるような、貴方の目的に合致した深層学習を活用するプログラムをすぐに作成できるでしょう。</p>
+<p>もし嘘だと思うなら、「2. インストール」の記述に従ってTensorFlowをインストールして、「4. プログラムの作成」で作成する深度センサーのデータからの一般物体認識プログラムを実行してみてください。簡単（数式はゼロ！）な短い（全部で185行！）プログラムなのに、深度センサーの前に置かれたものが何なのかを高い精度（90%以上！）で答えてくれます。</p>
+<p>深層学習がどのように動作するのかは、「3. 深層学習の仕組み」で述べます。ここを読んで深層学習の仕組みを理解すれば、「4. プログラムの作成」のソース・コードを少し修正するだけで、すぐに深層学習を活用する新たなサービスを作成できるでしょう。</p>
 <p>深層学習は本当に簡単で、しかも有用です。「よく分からないけれど難しそう」という理由で使わないのはあまりにもったいない。深層学習をじゃんじゃん使って、鼻歌交じりに人工知能してみませんか？　かなり面白いですよ。</p>
 <h1>インストール</h1>
 <p>本章では、深層学習のライブラリの1つであるGoogleの<a href="https://www.tensorflow.org/">TensorFlow</a>と、TensorFlowの実行に必要な<a href="https://www.python.jp">Python</a>をインストールします。</p>
@@ -653,23 +653,23 @@ accuracy of test data: <span class="fl">0.9919999837875366</span></code></pre></
 <p>テスト・データでの正解率が99%を超えて、99.2%になりました！　深層学習って、スゴイですな。</p>
 <h1>プログラムの作成</h1>
 <p>このようにスゴイ深層学習を、実際のプログラムで試してみたくなりませんか？　私は試してみたくなっちゃったので、今回は、ロボットに一般物体認識させるプログラムを作ってきました。</p>
-<p>で、その作ってきたソース・コードは、テンプレートとして使用できるんじゃないかなーと考えてています。本章で紹介するソース・コードを少しだけ修正すれば、皆様が深層学習でやりたいことを実現できるんじゃないかなーと。</p>
-<h2>ソース・コード</h2>
+<p>で、その作ってきたソース・コードは、皆様が深層学習するときのテンプレートとして使用できるんじゃないかなーと考えてています。本章で紹介するソース・コードを少し修正するだけで、皆様が深層学習でやりたいことを実現できるんじゃないかなーと。</p>
+<h2>ソース・コードの取得方法</h2>
 <p>そんなことを言われても、現物を見なければ信用できない？　その通りですね。ソース・コードは<a href="https://github.com/tail-island/jellyfish-eye/">GitHub</a>で管理していますので、<a href="https://git-for-windows.github.io/">Git for Windows</a>をセットアップして、以下のコマンドでダウンロードしてみてください。</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="op">&gt;</span> <span class="bu">cd</span> TensorFlow  # 「2. インストール」で作成した、TensorFlow用の仮想環境
 <span class="op">&gt;</span> <span class="fu">git</span> clone https://github.com/tail-island/jellyfish-eye.git</code></pre></div>
 <p>なお、プロジェクト名のjellyfish-eyeは、一部のクラゲは高機能な目を持っていて、脳がないにもかかわらず目で見た情報を処理して活用しているらしいことに由来しています。脳を持たないロボットがセンサーの情報にもとづいて自律行動しちゃうぜって感じですね。</p>
 <h2 id="python">Pythonのパッケージ</h2>
 <p>Pythonでは、ファイルがパッケージの単位になります。<code>./aaa.py</code>の中から<code>./bbb.py</code>に含まれる関数を使う際には、<code>import bbb</code>してあげなければならないわけですね。</p>
-<p>今回は、あとでコードを活用できるように、複数のファイルに分割しました。その際に、管理が楽になるように専用のパッケージを作成しています。<code>./xxx/ccc.py</code>のようにして、<code>import xxx.ccc</code>にしたわけですな。</p>
+<p>今回は、あとでコードを活用できるように、複数のファイルに分割しました。その際に、管理が楽になるように専用のパッケージを作成しています。<code>./xxx/ccc.py</code>のようにプログラム・ファイルをディレクトリの下に配置して、<code>import xxx.ccc</code>にしたわけですな。</p>
 <p>このパッケージ名（ディレクトリ名）は、Pythonの文法に合うようにプロジェクト名の<code>-</code>を<code>_</code>に置換して、<code>jellyfish_eye</code>としました。</p>
 <div class="sourceCode"><pre class="sourceCode bash"><code class="sourceCode bash"><span class="op">&gt;</span> <span class="fu">mkdir</span> jellyfish_eye</code></pre></div>
 <h2>データ</h2>
 <p>私の手持ちのロボットはTurtleBotというロボットで、これには深度センサー（MicrosoftのKinectのような、ドット単位で、センサーから物体までの距離を計測できるもの）が付いています。</p>
 <p>＊＊＊絵＊＊＊</p>
-<p>この深度センサーのデータを深層学習で処理して、ロボットの前に置かれたものが何かを回答することにしましょう（本稿では紹介しませんけど、実は、指定した物体の前まで移動するロボット用のプログラムも書いています。ロボットがモノを見分けるように見えて気持ち悪いデモをご覧になりたい場合は、声をかけてください）。</p>
+<p>この深度センサーのデータを深層学習で処理して、ロボットの前に置かれたものが何かを回答することにしましょう（本稿では紹介しませんけど、実は、指定した物体の前まで移動するロボット用のプログラムも書いています。ロボットがモノを見分けるように見えて少し不気味なデモをご覧になりたい場合は、声をかけてください）。</p>
 <p>ロボットの回答のレベルについても、考えなければなりません。というのも、「ギター」と回答するのか「平沢唯のギー太」と回答するのかで、難しさが変わってくるんですよ。「平沢唯のギー太」で学習して「平沢唯のギー太」を見つけるのは特定物体認識と呼ばれる技術で、実は簡単で面白くない。だから、「平沢唯のギー太」で学習して、学習データには含まれていなかった「中野梓のフェンダーJAPANのムスタング」についても「ギター」と答えてくれる、一般物体認識をやることにしましょう。</p>
-<p>以上で方針が決まりましたので、学習用のデータを作成しました。ロボットの上でプログラムを動かして、縦100ドット×横100ドット×(3原色＋距離)のデータを、「カレンダー」と「飲み物」、「ティッシュ・ペーパー」の3種類分、集めてきました（会社の机の周りにあった、適当なもの3種類です）。</p>
+<p>以上で方針が決まりましたので、学習用のデータを作成しました。ロボットの上でプログラムを動かして、縦100ドット×横100ドット×(3原色＋距離)のデータを、「カレンダー」と「飲み物」、「ティッシュ・ペーパー」の3種類分、集めてきました（会社の机の周りにあった、適当なモノを3種類です）。</p>
 <p>データを格納しているディレクトリーの構造は、以下の通り。</p>
 <pre><code>data
 ├── calendar
@@ -690,10 +690,10 @@ accuracy of test data: <span class="fl">0.9919999837875366</span></code></pre></
     ├── Kleenex_ハイクオリティ_フェイシャルティシュー
     ├── Kleenex_ローションティシュー_エックス
     └── エリエール_贅沢保湿</code></pre>
-<p>三階層目のディレクトリーの中に、それぞれの物体のデータが入ります。様々な角度から、1物体につき</p>
+<p>三階層目のディレクトリーの中に、それぞれの物体のデータが入ります。様々な角度から、1物体につき複数のデータを採取しています。</p>
 <p>データの単位で、ファイルは分割されています（ファイルの拡張子は.txt）。そのファイルの1行は1ドットを表していて「赤<空白>青＜空白＞緑＜空白＞距離」となっています（それぞれのデータの範囲は、0.0〜1.0）。最初の行は左上のドット、次の行はその右のドットと続き、最も右下のドットまで、10000行続いています。</p>
 <h2 id="jellyfish_eyedata_sets.py">jellyfish_eye/data_sets.py</h2>
-<p>今回は独自のデータを使用していますから、前章のMNISTの場合のような便利クラスはありません。だから、データ管理のコードを作成しました。</p>
+<p>今回は独自のデータを使用していますから、前章のMNISTの場合のような便利クラスはありません。ですから、データ管理のコードを作成しました。</p>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
 <span class="im">import</span> os
 
@@ -756,13 +756,13 @@ accuracy of test data: <span class="fl">0.9919999837875366</span></code></pre></
 
     <span class="co"># 訓練データとテスト・データに分割します。</span>
     <span class="kw">def</span> train_and_test(images):
-        <span class="co"># 25番目以降を訓練データ、それより前をテスト・データとします。</span>
-        <span class="cf">return</span> images[<span class="dv">25</span>:], images[:<span class="dv">25</span>]
+        <span class="co"># 20番目以降を訓練データ、それより前をテスト・データとします。</span>
+        <span class="cf">return</span> images[<span class="dv">20</span>:], images[:<span class="dv">20</span>]
 
     <span class="co"># クラス（カレンダーや飲み物）単位でデータを読み込んで、訓練データとテスト・データに分割し、データ・セットのクラスを生成します。</span>
     <span class="cf">return</span> <span class="bu">map</span>(DataSet, <span class="bu">zip</span>(<span class="op">*</span><span class="bu">map</span>(train_and_test, <span class="bu">map</span>(load_class, <span class="bu">map</span>(partial(os.path.join, data_path), <span class="bu">sorted</span>(os.listdir(data_path)))))))</code></pre></div>
-<p>上半分の<code>class DataSet</code>は、深層学習を使う目的がクラス分類ならば、どのようなデータでも使えると思います。お好きにコピー＆ペーストしてみてください。<code>_shuffle()</code>等では、NumPyの機能をフルに使っています。</p>
-<p>下半分の<code>load()</code>は、対象データによって異なりますので、コピー＆ペーストは駄目。他のデータを扱う場合は、書き直さなければなりません。書き直しの負荷を減らすにはソース・コードの量を減らすのが有効で、そのためには関数型プログラミングが効く。というわけで、Pythonの公式文書の<a href="https://docs/python.jp/3/howto/functional.html">関数型プログラミング HOWTO</a>を読んで、関数型で書いてみました。<a href="https://docs/python.jp/3/howto/functional.html">関数型プログラミング HOWTO</a>は非常にわかりやすいので、一読すれば、上のコードのような感じに関数型プログラミングできます。</p>
+<p>上半分の<code>class DataSet</code>は、深層学習を使う目的がクラス分類ならば、どのようなデータでも使えると思います。お好きにコピー＆ペーストしてみてください。<code>_shuffle()</code>等でNumPyの面白機能を使っていて、NumPyの奥深さを味わえますな。</p>
+<p>下半分の<code>load()</code>は、対象データが異なれば、書き直しになるでしょう。その書き直しの負荷を減らすにはソース・コードの量を減らすのが有効で、そのためには関数型プログラミングが効く。だから、Pythonの公式文書の<a href="https://docs/python.jp/3/howto/functional.html">関数型プログラミング HOWTO</a>を読んで、関数型で書いてみました。<a href="https://docs/python.jp/3/howto/functional.html">関数型プログラミング HOWTO</a>は非常にわかりやすいので、一読すれば、上のコードのような感じに関数型プログラミングでコード量を削減できますよ。あと、今回は採取できたデータ量が少なかったので、訓練用とテスト用の2つのデータ・セットしか使用しないことにしました。</p>
 <h2 id="jellyfish_eyemodel.py">jellyfish_eye/model.py</h2>
 <p>次は、ニューラル・ネットワークを定義することにしましょう。以下がそのコード。</p>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> tensorflow <span class="im">as</span> tf
@@ -818,9 +818,188 @@ is_training <span class="op">=</span> tf.placeholder_with_default(<span class="v
 <span class="co"># 精度。</span>
 <span class="kw">def</span> accuracy(logits):
     <span class="cf">return</span> tf.reduce_mean(tf.cast(tf.nn.in_top_k(logits, labels, <span class="dv">1</span>), tf.float32))</code></pre></div>
-<p>前章でやった畳み込みニューラル・ネットワークのコードから、ニューラル・ネットに関係する部分を抜き出して、関数化しただけですね。</p>
-<p>これらの処理を別パッケージに抜き出した理由は、変更が多い部分を局所化するためです。深層学習してみたのだけど精度が低いという場合は、ニューラル・ネットワークをチューニングしなければなりません。で、チューニングで何をするかというと、<code>max_pool2d()</code>や<code>conv2d()</code>、<code>fully_connected()</code>の引数を変更することになります。畳み込みで出力されるチャンネル数を増やしたりとかね。あと、畳込み層を増やしちゃうなんてのもよくやります。これらのチューニング作業が、この<code>model.py</code>の修正だけで済むわけ。</p>
+<p>前章でやった畳み込みニューラル・ネットワークのコードから、ニューラル・ネットに関係する部分を抜き出して、関数化しただけです。</p>
+<p>で、これらの処理をわざわざ別のパッケージに抜き出した理由は、変更が多い部分を局所化するためです。深層学習してみたのだけど精度が低いという場合は、ニューラル・ネットワークをチューニングしなければなりません。で、チューニングでは何をするかというと、<code>max_pool2d()</code>や<code>conv2d()</code>、<code>fully_connected()</code>の引数を変更することになります。畳み込みで出力されるチャンネル数を増やしたりとかね。あとは、畳込み層を増やすなんてのも、よくやります。これらのチューニング作業が、この<code>model.py</code>の修正だけで済むというわけ。</p>
 <h2 id="jellyfish_eyeutilities.py">jellyfish_eye/utilities.py</h2>
+<p>さて、TensorFlowはとても良くできているのですけど、でも、痒いところ全てに手が届くような環境ではありません。あと、Python流のやり方の中には、<a href="https://docs/python.jp/3/howto/functional.html">関数型プログラミング HOWTO</a>を熟読しちゃって関数型になった後だと気持ち悪く感じるものもあります。</p>
+<p>というわけで、ユーティリティーをいくつか作ってきました。</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> tensorflow <span class="im">as</span> tf
+
+
+<span class="co"># 画像をTensorBoardで確認できるようにするために、サマリーに追加します。</span>
+<span class="kw">def</span> summary_image(name, variable):
+    <span class="co"># 一つ目の画像だけを抜き出して、サマリーに追加します。</span>
+    tf.summary.image(name, tf.<span class="bu">slice</span>(variable, (<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), (<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>)))
+
+    <span class="co"># 呼び出し時に一時変数を作らなくて済むようにするために、variableをリターンしておきます。関数型だと、一時変数は気持ち悪い。</span>
+    <span class="cf">return</span> variable
+
+
+<span class="co"># 畳み込み後のような複数のチャンネルに別れた画像を、タイル状に並べてサマリーに追加します。</span>
+<span class="kw">def</span> summary_image_collection(name, variable):
+    <span class="co"># 画像の高さ、幅、タイル状に並べる際の行と幅を取得します。</span>
+    h <span class="op">=</span> tf.shape(variable)[<span class="dv">1</span>]
+    w <span class="op">=</span> tf.shape(variable)[<span class="dv">2</span>]
+    r <span class="op">=</span> tf.shape(variable)[<span class="dv">3</span>] <span class="op">//</span> <span class="dv">8</span>  <span class="co"># 畳込みの出力チャンネル数は、8の倍数にしてください……。</span>
+    c <span class="op">=</span> <span class="dv">8</span>
+
+    <span class="co"># 一つ目の画像を、チャンネル単位にタイル状に並べます。</span>
+    image <span class="op">=</span> tf.<span class="bu">slice</span>(variable, (<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>), (<span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>, <span class="op">-</span><span class="dv">1</span>))
+    image <span class="op">=</span> tf.reshape(image, (h, w, r, c))
+    image <span class="op">=</span> tf.transpose(image, (<span class="dv">2</span>, <span class="dv">0</span>, <span class="dv">3</span>, <span class="dv">1</span>))
+    image <span class="op">=</span> tf.image.adjust_contrast(image, <span class="dv">1</span>)
+    image <span class="op">=</span> tf.reshape(image, (<span class="dv">1</span>, r <span class="op">*</span> h, c <span class="op">*</span> w, <span class="dv">1</span>))
+
+    <span class="co"># サマリーに追加します。</span>
+    tf.summary.image(name, image)
+
+    <span class="co"># 呼び出し時に一時変数を作らなくて済むようにするために、variableをリターンしておきます。</span>
+    <span class="cf">return</span> variable
+
+
+<span class="co"># スカラー（1.0や'abc'などの、単一の値）を、サマリーに追加します。</span>
+<span class="kw">def</span> summary_scalar(name, variable):
+    <span class="co"># サマリーに追加します。</span>
+    tf.summary.scalar(name, variable)
+
+    <span class="co"># 呼び出し時に一時変数を作らなくて済むようにするために、variableをリターンしておきます。</span>
+    <span class="cf">return</span> variable</code></pre></div>
+<p>……えっと、サマリー関連だけですな。ユーティリティーが少ないのは、私が手を抜いたからではなく、TensorFlowの完成度が高いためです。</p>
+<p>さて、<code>summary_image()</code>や<code>summary_image_collection()</code>するとTensorFlowの可視化ツールであるTensorBoardで、深層学習がどのように働くのかを以下のような形で見る事ができます。</p>
+<p>＊＊＊絵＊＊＊</p>
+<p>前項のように損失関数を<code>summary_scalar()</code>しておけば、値がどのように変化したのかが、以下のようにグラフで見ることができます。</p>
+<p>＊＊＊絵＊＊＊</p>
+<h2 id="jellyfish_eyetrain.py">jellyfish_eye/train.py</h2>
+<p>以上で、道具が揃いましたから、深層学習させるコードを書きましょう。</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> jellyfish_eye.data_sets <span class="im">as</span> data_sets
+<span class="im">import</span> jellyfish_eye.model <span class="im">as</span> model
+<span class="im">import</span> tensorflow <span class="im">as</span> tf
+
+
+<span class="co"># 学習用データを取得します。</span>
+train_data_set, test_data_set <span class="op">=</span> data_sets.load()
+
+<span class="co"># モデルで定義したplaceholderを取得します。</span>
+inputs <span class="op">=</span> model.inputs
+labels <span class="op">=</span> model.labels
+is_training <span class="op">=</span> model.is_training
+
+<span class="co"># ニューラル・ネットワークを定義します。</span>
+logits <span class="op">=</span> model.inference()
+train <span class="op">=</span> model.train(model.loss(logits))
+accuracy <span class="op">=</span> model.accuracy(logits)
+
+<span class="co"># 学習に必要な環境を整えます。</span>
+global_step <span class="op">=</span> tf.contrib.framework.get_or_create_global_step()  <span class="co"># 何ステップ目の学習なのかを表現します。</span>
+inc_global_step <span class="op">=</span> tf.assign(global_step, tf.add(global_step, <span class="dv">1</span>))  <span class="co"># global_stepに1を足してインクリメントします。</span>
+summary <span class="op">=</span> tf.summary.merge_all()  <span class="co"># TensorBoardへの出力をまとめます。</span>
+supervisor <span class="op">=</span> tf.train.Supervisor(logdir<span class="op">=</span><span class="st">'logs'</span>, save_model_secs<span class="op">=</span><span class="dv">60</span>, save_summaries_secs<span class="op">=</span><span class="dv">60</span>, summary_op<span class="op">=</span><span class="va">None</span>)  <span class="co"># 学習全体を管理します。</span>
+
+<span class="co"># Supervisor経由で、セッションを取得します。</span>
+<span class="cf">with</span> supervisor.managed_session() <span class="im">as</span> session:
+    <span class="co"># Supervisorが問題を検出しなければ、学習を繰り返します。</span>
+    <span class="cf">while</span> <span class="kw">not</span> supervisor.should_stop():
+        <span class="co"># グローバル・ステップの値を取得します。</span>
+        global_step_value <span class="op">=</span> session.run(global_step)
+
+        <span class="co"># バッチ学習で、ニューラル・ネットワークを訓練します。</span>
+        train_inputs, train_labels <span class="op">=</span> train_data_set.next_batch(<span class="dv">20</span>)
+        session.run(train, feed_dict<span class="op">=</span>{inputs: train_inputs, labels: train_labels, is_training: <span class="va">True</span>})
+
+        <span class="co"># 一定のタイミングで、サマリーを取得したり、精度を出力したりします。</span>
+        <span class="cf">if</span> global_step_value <span class="op">%</span> <span class="dv">10</span> <span class="op">==</span> <span class="dv">0</span>:
+            <span class="co"># サマリーを取得します。</span>
+            supervisor.summary_computed(session, session.run(summary, feed_dict<span class="op">=</span>{inputs: train_inputs, labels: train_labels, is_training: <span class="va">True</span>}))
+
+            <span class="co"># 精度を出力します。</span>
+            <span class="bu">print</span>(<span class="st">'global step </span><span class="sc">{0:&gt;4d}</span><span class="st">: train accuracy = </span><span class="sc">{1:.4f}</span><span class="st">, test accuracy = </span><span class="sc">{2:.4f}</span><span class="st">.'</span>.<span class="bu">format</span>(
+                global_step_value,
+                session.run(accuracy, feed_dict<span class="op">=</span>{inputs: train_inputs, labels: train_labels}),
+                session.run(accuracy, feed_dict<span class="op">=</span>{inputs: test_data_set.inputs, labels: test_data_set.labels})))
+
+        <span class="co"># グローバル・ステップをインクリメントします。</span>
+        session.run(inc_global_step)</code></pre></div>
+<p>学習するだけなら、前章のコードのような簡単なものでも良いのですけど、学習して終わりじゃあ意味がないですよね？　学習した結果を活用して、サービスを作らないとね。あと、学習の途中でコンピューターが落ちたら最初からやり直しではキツイので、途中から学習を再開できる仕組みも必要です。学習が良い感じに進んでいるかどうか、目で見て確認もしたいですね。</p>
+<p>というわけで、<code>tf.train.Supervisor</code>を使いましょう。<code>Supervisor</code>を使うと、学習したモデルを<code>save_model_secs</code>で指定したタイミングで保存してくれます。そして、<code>Supervisor</code>経由でセッションを取得すれば、最新の学習結果（<code>logs/checkpoint</code>というファイルの中で指定すれば、最新でなくても可）で初期化されたモデルが手に入ります。これなら、保存された学習結果を活用するサービスを作れますし、学習の途中で中断して、その後に再開することもできます。サマリーも<code>save_summaries_secs</code>で指定した間隔で保存してくれますから、前述したモデルの中でサマリーに追加した情報を見ることもできます。</p>
+<p>たしかに、<code>Supervisor</code>を使うには<code>global_step</code>の作成が必要だったり、<code>global_step</code>をインクリメントする処理が必要だったり、<code>summary_op=None</code>しておかないと<code>feed_dict</code>が必要なサマリーは使えなかったりとか、少し面倒なところはあります。でも、その面倒は、上のコードをコピー＆ペーストすればゼロにできます。対象データやニューラル・ネットワークの内容が異なっても訓練のやり方は変わらないので、上のコードの<code>import</code>する名前空間を変更するだけで、皆様のプロジェクトでも使えると思いますよ。</p>
+<h2 id="jellyfish_eyeserve.py">jellyfish_eye/serve.py</h2>
+<p>ついでですから、サービス化の前準備もしてしまいましょう。深層学習した結果を活用して、物体が何なのかを判断する関数を作成します。</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> jellyfish_eye.model <span class="im">as</span> model
+<span class="im">import</span> numpy <span class="im">as</span> np
+<span class="im">import</span> tensorflow <span class="im">as</span> tf
+
+
+<span class="co"># モデルで定義したplaceholderを取得します。</span>
+inputs <span class="op">=</span> model.inputs
+
+<span class="co"># ニューラル・ネットワークを定義します。確率で表現したいので、tf.nn.softmaxをtf.nn.top_kとinferenceの間に入れます。</span>
+top_k <span class="op">=</span> tf.nn.top_k(tf.nn.softmax(model.inference()), k<span class="op">=</span><span class="dv">3</span>)
+
+<span class="co"># サービスに必要な環境を整えます。</span>
+supervisor <span class="op">=</span> tf.train.Supervisor(logdir<span class="op">=</span><span class="st">'logs'</span>, save_model_secs<span class="op">=</span><span class="dv">0</span>, save_summaries_secs<span class="op">=</span><span class="dv">0</span>)
+session <span class="op">=</span> supervisor.PrepareSession()  <span class="co"># セッションを使いまわしたいので、managed_sessionではなくてPrepareSession()。なんで大文字なんだろ？</span>
+
+
+<span class="co"># クラスを判断します。</span>
+<span class="kw">def</span> classify(<span class="bu">input</span>):
+    <span class="cf">return</span> session.run(top_k, feed_dict<span class="op">=</span>{inputs: np.array((<span class="bu">input</span>,))})
+
+
+<span class="co"># ダミーの実行モジュール。削除しても構いません。</span>
+<span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">'__main__'</span>:
+    <span class="im">import</span> jellyfish_eye.data_sets <span class="im">as</span> data_sets
+    <span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plot
+    <span class="im">import</span> time
+
+    _, test_data_set <span class="op">=</span> data_sets.load()
+    classes <span class="op">=</span> []
+
+    starting_time <span class="op">=</span> time.time()
+    <span class="cf">for</span> <span class="bu">input</span> <span class="kw">in</span> test_data_set.inputs:
+        classes.append(classify(<span class="bu">input</span>))
+    finishing_time <span class="op">=</span> time.time()
+
+    <span class="cf">for</span> <span class="bu">input</span>, label, class_ <span class="kw">in</span> <span class="bu">zip</span>(test_data_set.inputs, test_data_set.labels, classes):
+        <span class="bu">print</span>(<span class="st">'</span><span class="sc">{0}</span><span class="st"> : </span><span class="sc">{1}</span><span class="st">, </span><span class="sc">{2}</span><span class="st">'</span>.<span class="bu">format</span>(label, class_.indices[<span class="dv">0</span>][<span class="dv">0</span>], <span class="bu">tuple</span>(<span class="bu">zip</span>(class_.indices[<span class="dv">0</span>], class_.values[<span class="dv">0</span>]))))
+        
+        plot.imshow(np.reshape(<span class="bu">input</span>, (<span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">4</span>)))
+        plot.show()
+        
+    <span class="bu">print</span>(<span class="st">'Elapsed time: </span><span class="sc">{0:.4f}</span><span class="st"> sec'</span>.<span class="bu">format</span>((finishing_time <span class="op">-</span> starting_time) <span class="op">/</span> <span class="bu">len</span>(test_data_set.inputs)))</code></pre></div>
+<p>前項で紹介した<code>Supervisor</code>を使えば、サービスの提供も簡単です。セッション取得のための時間を節約するために、managed_session()ではなくPrepareSession()するところに注意するだけ。あとは、バッチ学習じゃないので、<code>input</code>から<code>inputs</code>に変換するために形を変換する程度。こっちも、上のコードの上半分をコピー＆ペーストすれば大丈夫だと思いますよ。</p>
+<p>このコードがあれば、以下のようにして他のパッケージから深層学習の結果を利用することができます。</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> jellyfish_eye.serve
+
+...
+
+image <span class="op">=</span> ...  <span class="co"># 深度センサーからデータを取得。</span>
+
+<span class="cf">if</span> jellyfish_eye.serve(image).indices[<span class="dv">0</span>][<span class="dv">0</span>] <span class="op">==</span> <span class="dv">0</span>:  <span class="co"># ディレクトリの名前順でクラスを決めたので、0がcalendarで1がdrink、2がtissue-paper。</span>
+  <span class="co"># カレンダーが前に置かれたので、予定をチェックする等の処理を実行する。</span></code></pre></div>
+<h2>実行</h2>
+<p>以上で全てのコードが完成したので、実行してみましょう。Pythonでパッケージ名を指定して実行するときは<code>python -m &lt;パッケージ名&gt;</code>とします。今回のコードの場合は、訓練したいなら<code>python -m jellyfish_eye.train</code>、サービスを提供するなら<code>python -m jellyfish_eye.serve</code>となります。</p>
+<p>深層学習の結果は……</p>
+<p>＊＊＊絵＊＊＊</p>
+<p>うん、精度が90%を超えました！　かなり良いんじゃないでしょうか？</p>
+<p>なお、GPUが無い私のコンピューターだとここまで訓練するのにxx分くらいかかりましたが、GeForce 980Tiという型遅れの10万円のGPUを積んだコンピューターで実験してみたら、yy分で終わりました。2017年3月現在なら980Tiよりももっと性能がよい1080が8万円程度で買えますから、もし深層学習に興味を持ったならGPUを買うことをおすすめします。</p>
+<p>あと、学習している間は暇だなーと感じるようでしたら、TensorFlowのツールであるTensorBoardで学習内容を可視化してみてください。TensorBoardの実行は、<code>tesnsorboard --logdir=logs</code>です。TensorBoardが起動したら、Webブラウザを開いてURLに<code>localhost:6006</code>と入れればオッケー。こうすると、前の項で見ていただいたような畳込み結果や入力画像を見られたり、損失関数がどんどん減っている（学習がどんどん進んでいる）ことが分かるので、あまり退屈しないで済みます。</p>
+<p>＊＊＊絵＊＊＊</p>
+<p>さて、訓練が終わったので、その結果をサービス化してみると……</p>
+<p>＊＊＊絵＊＊＊</p>
+<p>うん、正しく実行できていますね。深層学習の「学習」には時間がかかりますけど、深層学習した結果を実行するだけなら、GPUなしでもかなり速いです。一回の判断に0.076秒しかかかっていないんですからね。これなら、私のロボットに積んでいるRaspberry Piでも実行できそうです。</p>
+<h1>おわりに</h1>
+<p>ほら、深層学習って、簡単でしょ？　本稿のコードをコピー＆ペーストして、データを取得する部分を書き直して、必要に応じてニューラル・ネットワークをチューニングすればよいだけなんですから。</p>
+<p>多層パーセプトロンや畳込み、プーリング、ドロップアウトという深層学習で使われる道具については、数学なしでもその概念を理解できました<a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a>。概念が分かっているのですから、ニューラル・ネットワークのチューニングは可能なはず<a href="#fn8" class="footnoteRef" id="fnref8"><sup>8</sup></a>。逆誤差伝播学習法の詳細になると数学が必要なのですけど、TensorFlowが全自動でやってくれるから詳細を理解していなくても問題ないし<a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a>。ほらやっぱり、深層学習は簡単。</p>
+<p>でも所詮、深層学習って画像が何なのかを判断できるるだけなんでしょ？　データが画像以外だったらどうするのよ……という反論が聞こえてきそうですけど、実は深層学習は画像以外でも使えます。私は先日、ひょんなことから「超音波センサー10個の距離情報から、トイレの個室でのスマートフォン使用を検知する」システムのプロトタイプを作ったのですけど、適当に取った数人×数分のデータを以下のニューラル・ネットワークに食わせて学習してみたら、70%を超える精度が出ちゃいました。</p>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> inference():
+    outputs <span class="op">=</span> tf.reshape(inputs, (<span class="op">-</span><span class="dv">1</span>, data_sets.history_size, <span class="dv">1</span>, data_sets.channel_size))  <span class="co"># 幅を1にして、1次元データをconvolution2dできるようにします。</span>
+    outputs_list <span class="op">=</span> [tf.contrib.layers.max_pool2d(tf.contrib.layers.convolution2d(outputs, <span class="dv">128</span>, (kernel_size, <span class="dv">1</span>), padding<span class="op">=</span><span class="st">'VALID'</span>), (data_sets.history_size <span class="op">-</span> kernel_size <span class="op">+</span> <span class="dv">1</span>, <span class="dv">1</span>)) <span class="cf">for</span> kernel_size <span class="kw">in</span> (<span class="dv">5</span>, <span class="dv">4</span>, <span class="dv">3</span>, <span class="dv">2</span>)]
+    outputs <span class="op">=</span> tf.concat(<span class="dv">1</span>, [tf.contrib.layers.flatten(outputs) <span class="cf">for</span> outputs <span class="kw">in</span> outputs_list])  <span class="co"># 次元0はバッチなので、次元1でconcatします。</span>
+    outputs <span class="op">=</span> tf.contrib.layers.stack(outputs, tf.contrib.layers.fully_connected, (<span class="dv">1024</span>, <span class="dv">512</span>))
+    outputs <span class="op">=</span> tf.contrib.layers.dropout(outputs, is_training<span class="op">=</span>is_training)
+
+    <span class="cf">return</span> tf.contrib.layers.linear(outputs, <span class="dv">2</span>)</code></pre></div>
+<p>ちなみに、このニューラル・ネットワークは、<a href="http://tkengo.github.io/blog/2016/03/11/understanding-convolutional-neural-networks-for-nlp/">自然言語処理における畳み込みニューラルネットワークを理解する</a>で引用されている論文（hang, Y., &amp; Wallace, B. (2015). A Sensitivity Analysis of (and Practitioners' Guide to) Convolutional Neural Networks for Sentence Classification）の、文章をカケラも読まずに図だけを見て作ったモノです。深層学習は道具立てが簡単なので、けっこう楽ちんに小難しい論文の内容を活用できるんです。ぜひ、皆様も試してみてください。</p>
 <section class="footnotes">
 <hr />
 <ol>
@@ -830,6 +1009,9 @@ is_training <span class="op">=</span> tf.placeholder_with_default(<span class="v
 <li id="fn4"><p>Chainerは、微分をライブラリ内に実装することでこの問題を解決しています。私のような一般人が作るニューラル・ネットワークなら、TensorFlowと同様に微分と無関係に深層学習できますので、ご安心ください。<a href="#fnref4">↩</a></p></li>
 <li id="fn5"><p>遺伝的プログラミングのように、計算式そのものを生成するような学習もありますけど。<a href="#fnref5">↩</a></p></li>
 <li id="fn6"><p>深層学習で使うニューラル・ネットワークってのは、微分（劣微分を含む）可能な演算でつながれた計算式にすぎません。だから、生物の脳やニューロンとは関係がないニューラル・ネットワークもあります。最近の再帰ニューラル・ネットワークなんかだと、ニューラルな感じはゼロで、なんでそれで答えを導けるのか全くわからなくて面白いですよ。<a href="#fnref6">↩</a></p></li>
+<li id="fn7"><p>再帰型ニューラル・ネットワークについての説明は、ごめんなさい、使い方が定まるまで待ってください……。<a href="#fnref7">↩</a></p></li>
+<li id="fn8"><p>数学的に理解している人たちも、結構行き当たりばったりでチューニングしているみたいだしね。<a href="#fnref8">↩</a></p></li>
+<li id="fn9"><p>少なくとも私は、本稿に書いたレベルまでしか理解できていません。でもだいじょーぶ。<a href="#fnref9">↩</a></p></li>
 </ol>
 </section>
 </article>
