@@ -263,11 +263,14 @@ def summary_scalar(name, variable):
 
 さて、`summary_image()`や`summary_image_collection()`するとTensorFlowの可視化ツールであるTensorBoardで、深層学習がどのように働くのかを以下のような形で見る事ができます。
 
-＊＊＊絵＊＊＊
+![summary\_image()](images/tensorboard-summary-image.png "summary_image()しているので、入力データを可視化できました。")
+
+
+![summary\_image\_collection()](images/tensorboard-summary-image-collection.png "`summary_image_collection()`しているので、畳み込みの結果を可視化できました。タイル状に並んだ画像がいい感じに異なっていれば、学習が進んだと判断できます。")
 
 前項のように損失関数を`summary_scalar()`しておけば、値がどのように変化したのかが、以下のようにグラフで見ることができます。
 
-＊＊＊絵＊＊＊
+![summary\_scalar()](images/tensorboard-summary-scalar.png "`summary_scalar()`しているので、損失関数の値の変化を可視化できました。0に近づいているので、学習は進んでいると考えられます。")
 
 ## jellyfish\_eye/train.py
 
@@ -410,7 +413,11 @@ if jellyfish_eye.serve(image).indices[0][0] == 0:  # ディレクトリの名前
 
 あと、学習している間が暇だなーと感じるようでしたら、TensorFlowのツールであるTensorBoardで学習内容を可視化してみてください。TensorBoardの実行は、`tesnsorboard --logdir=logs`です。TensorBoardが起動したら、Webブラウザを開いてURLに`localhost:6006`と入れればオッケー。こうすると、前の項で見ていただいたような畳込み結果や入力画像を見られたり、損失関数がどんどん減っている（学習がどんどん進んでいる）ことが分かるので、あまり退屈しないで済みます。
 
-＊＊＊絵＊＊＊
+![summary\_image()](images/tensorboard-summary-image.png)
+
+![summary\_image\_collection()](images/tensorboard-summary-image-collection.png)
+
+![summary\_scalar()](images/tensorboard-summary-scalar.png)
 
 さて、訓練が終わったので、その結果をサービス化してみると……
 
