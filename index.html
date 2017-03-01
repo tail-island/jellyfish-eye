@@ -981,7 +981,7 @@ image <span class="op">=</span> ...  <span class="co"># 深度センサーから
 
 <span class="cf">if</span> jellyfish_eye.serve.classify(image).indices[<span class="dv">0</span>][<span class="dv">0</span>] <span class="op">==</span> <span class="dv">1</span>:  <span class="co"># ディレクトリの名前順でクラスを決めたので、0がcalendarで1がdrink、2がtissue-paper。</span>
   <span class="co"># 飲み物が目の前に置かれたので、飲み干す等の処理を実行する。</span></code></pre></div>
-<p>利用する側のコードは、皆様が作るサービスの内容によって大きく異なるでしょうから、皆様が作ってください。</p>
+<p>利用する側のコードは、皆様が作るサービスの内容によって大きく異なるでしょうから、ごめんなさい、皆様が作ってください。</p>
 <h2>実行</h2>
 <p>以上で、全てのコードが完成しました。さっそく実行してみましょう。Pythonでパッケージ名を指定して実行するときは<code>python -m &lt;パッケージ名&gt;</code>とします。今回のコードの場合は、訓練したいなら<code>python -m jellyfish_eye.train</code>、サービスを提供するなら<code>python -m jellyfish_eye.serve</code>となります。</p>
 <p>さて、注目の深層学習の結果は……</p>
