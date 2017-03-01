@@ -48,6 +48,9 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
   <!--[if lt IE 9]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv-printshiv.min.js"></script>
   <![endif]-->
+  <meta name="title" content="深層学習プログラミング・ガイド">
+  <meta name="description" content="深層学習の、多分最も簡単じゃないかなーと思うプログラミング・ガイド。">
+  <meta name="keywords" content="ディープラーニング, Deep Learning">
 </head>
 <body>
 <article class="markdown-body">
@@ -57,8 +60,8 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>TensorFlowやChainerといったライブラリが抽象化してくれるため、詳細（難しい数式等）を理解していなくても使える。</li>
 <li>汎用性が高いため、いわゆる統計処理や機械学習のような複数のアルゴリズムの使い分けが不要。必要な前提知識が少なくて済む。</li>
 </ol>
-<p>もし嘘だと思うなら、「2. インストール」の記述に従ってTensorFlowをインストールして、「4. プログラムの作成」で作成する深度センサーのデータからの一般物体認識プログラムを実行してみてください。簡単（数式はゼロ！）な短い（全部で185行！）プログラムなのに、深度センサーの前に置かれたものが何なのかを高い精度（90%以上！）で答えてくれます。</p>
-<p>深層学習がどのように動作するのかは、「3. 深層学習の仕組み」で述べます。ここを読んで深層学習の仕組みを理解すれば、「4. プログラムの作成」のソース・コードを少し修正するだけで、すぐに深層学習を活用する新たなサービスを作成できるでしょう。</p>
+<p>もし嘘だと思うなら、「2. インストール」の記述に従ってTensorFlowをインストールして、「4. プログラムの作成」の深度センサーのデータからの一般物体認識プログラムを実行してみてください。簡単（数式はゼロ！）な短い（全部で185行！）プログラムなのに、深度センサーの前に置かれたものが何なのかを高い精度（90%以上！）で答えてくれます。</p>
+<p>深層学習がどのように動作するのかは、「3. 深層学習の仕組み」で述べます。ここを読んで深層学習の仕組みを理解すれば、「4. プログラムの作成」のソース・コードを少し修正するだけで、すぐに深層学習を活用する新たなサービスを作成できます。</p>
 <p>深層学習は本当に簡単で、しかも有用です。「よく分からないけれど難しそう」という理由で使わないのはあまりにもったいない。深層学習をじゃんじゃん使って、鼻歌交じりに人工知能してみませんか？　かなり面白いですよ。</p>
 <h1>インストール</h1>
 <p>本章では、深層学習のライブラリの1つであるGoogleの<a href="https://www.tensorflow.org/">TensorFlow</a>と、TensorFlowの実行に必要な<a href="https://www.python.jp">Python</a>をインストールします。</p>
@@ -128,7 +131,7 @@ threshold <span class="op">=</span> <span class="dv">3</span>  <span class="co">
 <span class="op">&gt;&gt;&gt;</span></code></pre></div>
 <p>私は、読むべき有益な本があっても仕事が残っていても、晴れていればオートバイで出かけちゃう阿呆だということがわかりました。光に反応する昆虫みたいですな。</p>
 <p>でも、雨が降ったらどうなるのでしょうか？　続けて試してみましょう。</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="op">&gt;&gt;&gt;</span> formal_neuron(<span class="va">False</span>, <span class="va">True</span>, <span class="va">False</span>)  <span class="co"># 雨、本なし、仕事あり。</span>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">v<span class="op">&gt;&gt;&gt;</span> formal_neuron(<span class="va">False</span>, <span class="va">True</span>, <span class="va">False</span>)  <span class="co"># 雨、本なし、仕事あり。</span>
 <span class="va">False</span>  <span class="co"># 遊びに行かない。</span>
 <span class="op">&gt;&gt;&gt;</span> formal_neuron(<span class="va">False</span>, <span class="va">False</span>, <span class="va">True</span>)  <span class="co"># 雨、本あり、仕事なし。</span>
 <span class="va">False</span>  <span class="co"># 遊びに行かない。</span>
@@ -279,7 +282,7 @@ motorcycles <span class="op">=</span> (
         <span class="cf">for</span> label, xs <span class="kw">in</span> train_data:
             result <span class="op">=</span> perceptron(<span class="op">*</span>xs)
             <span class="cf">if</span> (result <span class="op">!=</span> label):
-                weights <span class="op">=</span> <span class="bu">tuple</span>(weights[i] <span class="op">+</span> learning_rate <span class="op">*</span> (label <span class="op">-</span> result) <span class="op">*</span> xs[i] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">len</span>(weights))
+                weights <span class="op">=</span> <span class="bu">tuple</span>(weights[i] <span class="op">+</span> learning_rate <span class="op">*</span> (label <span class="op">-</span> result) <span class="op">*</span> xs[i] <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(weights)))
                 bias <span class="op">=</span> bias <span class="op">+</span> learning_rate <span class="op">*</span> (label <span class="op">-</span> result)
 
     <span class="co"># 検証。</span>
@@ -333,7 +336,6 @@ motorcycles <span class="op">=</span> (
 <p>うん、なだらかかつ非線形ですな。ギャップがなくて直線じゃあないですもん。</p>
 <p>あと、活性化関数にはもう一つ特徴が必要で、それは「微分できる」ことなんだそうです。重みやバイアスをどの程度変えたらどのように出力が変わるのかが微分で分かるみたいで、そうすれば積み重ねたニューロンを、前の層へ、出力から入力へと逆に調整していくことが可能になるんです。このような、微分をうまいこと使って誤差を逆向きに伝播させて学習させる方式を、逆誤差伝播学習法（バックプロパゲーション）と呼びます。</p>
 <p>このような、出力を実数にして活性化関数を間に挟んで、逆誤差伝播学習法に類する方法で複数層のニューロンを学習させるという方式が、1960年代という大昔に発明されました。ただ、当時のコンピューターは貧弱すぎて、逆誤差伝播学習法はまともに動かなかったみたい。使えないものだからみんなすぐに忘れ、また誰かが再発明してまたみんなに忘れられ……という可哀想な運命を辿った挙句、1986年にラメルハートさんとその仲間たちが逆誤差伝播学習法と名づけたあたりで、コンピューターの性能が追いついてやっと定着したみたい。</p>
-<p>TODO: 以下の勾配消失の説明を修正すること！　掛け算の問題みたい。</p>
 <p>ただ、先程紹介したシグモイド関数って、端の方にいくと変化が小さくなってしまうんですよ。変化が小さいということは微分した結果も小さくなるということで、伝播が少ないので学習が進みづらくなってしまいます。この問題を、勾配消失問題と呼びます。だから、今ではシグモイド関数はあまり使われていなくて、ReLUという以下の図のような特徴を持つ活性化関数が流行っています。</p>
 <p>＊＊＊ReLUの図＊＊＊</p>
 <p>この図は、先程のシグモイド関数の場合とは全然似ていませんけど、でも、これでも活性化関数として使えるんですよ。線はつながっているので、まぁなだらかと言えまるでしょう。0のところで曲がっていますから、線形ではありません。0のところは数学的には微分できませんけど、0か1のどちらかに決め打っちゃえば大丈夫（劣微分と言うそうです）。ほら、なんとかなりました！</p>
@@ -424,7 +426,9 @@ attr {
 <p>まぁ、プログラミングのレベルでぶっちゃけていえば、テンソルってのは固定長の多次元の配列にすぎません。値そのものを表すスカラー（1や2.0）とかベクトル（平面座標<code>[x, y]</code>や立体座標<code>[x, y, z]</code>）とか行列（3次元グラフィックスの座標変換で使うアレ）とかを統一的に扱う仕組みですな。スカラーはランク0、ベクトルはランク1、行列はランク2のテンソルと表現されます。カラー画像の場合だと、そのランクは3になります。X座標、Y座標、色（RGBA）と3つ指定してはじめて、その明るさが分かるわけですからね。普段プログラミングでやっている内容ですから、あまり身構えないでください。</p>
 <p>で、なんでこのテンソルが深層学習で重要かというと、多層パーセプトロンをテンソルの演算として表現できるためです。単純パーセプトロンのとこでやった<code>sum(x * weight for x, weight in zip(xs, weights)</code>は、xsというテンソル（この場合はランク1なのでベクトル）とweightsというテンソル（同様にベクトル）に対するドット積（もしくは内積）と呼ばれる演算に相当します。だから、NumPyを使うなら上のコードは<code>np.dot(xs, weights)</code>とか<code>np.inner(xs, weights)</code>とか<code>np.matmul(xs, weights)</code>とかのように、とても簡単に書けます。</p>
 <p>パーセプトロンを複数個並べる場合だって、とても簡単です。たとえばパーセプトロンが2個なら、以下のような感じ。</p>
-<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">x <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>])            <span class="co"># 変数名がxsではなくてxなのは、テンソルはスカラーもベクトルも表現できちゃうので複数形の意味がなくなるため。</span>
+<div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
+
+x <span class="op">=</span> np.array([<span class="dv">1</span>, <span class="dv">2</span>])            <span class="co"># 変数名がxsではなくてxなのは、テンソルはスカラーもベクトルも表現できちゃうので複数形の意味がなくなるため。</span>
 w <span class="op">=</span> np.array([[<span class="dv">3</span>, <span class="dv">4</span>], [<span class="dv">5</span>, <span class="dv">6</span>]])  <span class="co"># 数学の本ではベクトルは太字にするみたいで、それを表現するために変数名を大文字にする数学プログラマーもいますけど、</span>
 b <span class="op">=</span> np.array([<span class="dv">7</span>, <span class="dv">8</span>])            <span class="co"># そこまで標準から外れるのは嫌なので、単数形でお茶を濁しました。</span>
 
@@ -488,7 +492,7 @@ accuracy <span class="op">=</span> tf.reduce_mean(tf.cast(tf.nn.in_top_k(logits,
 <p>次、訓練方法。学習率を考えるのは面倒なので<code>tf.train.AdamOptimizer</code>を使って全て任せることにして、誤差を最小化するように訓練するので<code>minimize()</code>を使用しています。あと、どの程度正解したかを確認するための<code>accuracy</code>という計算グラフも定義しておきます。<code>tf.nn.in_top_k()</code>は、<code>logit[label]</code>が、第三引数で指定した値の順位に収まっているかを調べます。<code>logits</code>が<code>[3, 2, 1]</code>で<code>label</code>が<code>2</code>の場合、第三引数が<code>1</code>や<code>2</code>なら<code>False</code>、<code>3</code>なら<code>True</code>になるわけですね。で、バッチ学習なので結果は<code>True</code>や<code>False</code>のベクトルになって、Pythonの<code>True</code>は1、<code>False</code>は0として扱えるので、<code>tf.float32</code>にキャストして<code>tf.reduce_mean()</code>で平均を取れば正解率になります。</p>
 <p>以上で計算グラフの定義は完了、あとは訓練するだけ。セッションを作成して、変数を初期化して、バッチ学習用のデータを取得して、訓練用の計算グラフである<code>train</code>を実行します。<code>train</code>が参照している<code>loss</code>が参照している<code>logits</code>の計算グラフには<code>images</code>と<code>labels</code>が含まれていて、それらの値が確定しないと計算を開始できませんから、名前付き引数の<code>feed_dict</code>でバッチ学習用のデータを渡しています。</p>
 <p>で、これで必須の作業は終わりなのですけど、訓練の結果どの程度正解したかを知りたいですよね？　だから、上のコードでは時々正解率を表示するようにしています。この正解率は、訓練データと検証データ、最後にはテスト・データの場合を表示しています。何度も似た情報を出力しているのは、訓練データに特化した学習（過学習といいます）をしてしまうのを避けるため。たとえばある問題集の解答を丸暗記すればその問題集には全問正解できるけれど、それでは他の問題集の問題は解けないので試験に落ちちゃって困っちゃう。訓練には使用していない検証データの正解率も調べておけば、訓練データでの正解率は向上しているけど検証データでの正解率は向上しないような場合に、過学習に陥ったと考えることができるわけ。検証データに加えてテスト・データでも正解率を出しているのは、ニューラル・ネットワークを調整（パーセプトロンの数を増やすとか、層を追加するとか）する際に、たまたま検証データに最適化した調整をしてしまうのを防ぐためです。検証データを使用して過学習を防いで、そのニューラル・ネットワークが本当に役に立つのかをテスト・データで検証していくわけですな。</p>
-<p>はい、これで解説は終わり！　プログラムを実行しましょう。少し時間がかかりますけど、最後に以下のような出力が出ます。</p>
+<p>はい、これで解説は終わり！　プログラムを実行しましょう。少し時間がかかりますけど、最後に以下のような出力が出ます（重みやバイアスの初期値はランダムなので、結果は正確に同じにはなりません。でも、大体同じ値になるはず）。</p>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python">accuracy of train data: <span class="fl">0.9900000095367432</span>
 accuracy of validation data: <span class="fl">0.9761999845504761</span>
 accuracy of test data: <span class="fl">0.9747999906539917</span></code></pre></div>
@@ -668,7 +672,7 @@ accuracy of test data: <span class="fl">0.9919999837875366</span></code></pre></
 <p>私の手持ちのロボットはTurtleBotというロボットで、これには深度センサー（MicrosoftのKinectのような、ドット単位で、センサーから物体までの距離を計測できるもの）が付いています。</p>
 <p>＊＊＊絵＊＊＊</p>
 <p>この深度センサーのデータを深層学習で処理して、ロボットの前に置かれたものが何かを回答することにしましょう（本稿では紹介しませんけど、実は、指定した物体の前まで移動するロボット用のプログラムも書いています。ロボットがモノを見分けるように見えて少し不気味なデモをご覧になりたい場合は、声をかけてください）。</p>
-<p>ロボットの回答のレベルについても、考えなければなりません。というのも、「ギター」と回答するのか「平沢唯のギー太」と回答するのかで、難しさが変わってくるんですよ。「平沢唯のギー太」で学習して「平沢唯のギー太」を見つけるのは特定物体認識と呼ばれる技術で、実は簡単で面白くない。だから、「平沢唯のギー太」で学習して、学習データには含まれていなかった「中野梓のフェンダーJAPANのムスタング」についても「ギター」と答えてくれる、一般物体認識をやることにしましょう。</p>
+<p>ロボットの回答のレベルについても、考えなければなりません。というのも、「ギター」と回答するのか「平沢唯のギー太」と回答するのかで、難しさが変わってくるんですよ。「平沢唯のギー太」で学習して「平沢唯のギー太」を見つけるのは特定物体認識と呼ばれる技術で、実はけっく簡単で面白くない。だから、「平沢唯のギー太」で学習して、学習データには含まれていなかった「中野梓のフェンダーJAPANのムスタング」でも「ギター」と答えてくれる、一般物体認識をやることにしましょう。</p>
 <p>以上で方針が決まりましたので、学習用のデータを作成しました。ロボットの上でプログラムを動かして、縦100ドット×横100ドット×(3原色＋距離)のデータを、「カレンダー」と「飲み物」、「ティッシュ・ペーパー」の3種類分、集めてきました（会社の机の周りにあった、適当なモノを3種類です）。</p>
 <p>データを格納しているディレクトリーの構造は、以下の通り。</p>
 <pre><code>data
@@ -693,7 +697,7 @@ accuracy of test data: <span class="fl">0.9919999837875366</span></code></pre></
 <p>三階層目のディレクトリーの中に、それぞれの物体のデータが入ります。様々な角度から、1物体につき複数のデータを採取しています。</p>
 <p>データの単位で、ファイルは分割されています（ファイルの拡張子は.txt）。そのファイルの1行は1ドットを表していて「赤<空白>青＜空白＞緑＜空白＞距離」となっています（それぞれのデータの範囲は、0.0〜1.0）。最初の行は左上のドット、次の行はその右のドットと続き、最も右下のドットまで、10000行続いています。</p>
 <h2 id="jellyfish_eyedata_sets.py">jellyfish_eye/data_sets.py</h2>
-<p>今回は独自のデータを使用していますから、前章のMNISTの場合のような便利クラスはありません。ですから、データ管理のコードを作成しました。</p>
+<p>今回は独自のデータを使用していますから、前章のMNISTの場合のような便利データ管理クラスはありません。ですから、データ管理のコードを作成しました。</p>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> numpy <span class="im">as</span> np
 <span class="im">import</span> os
 
@@ -762,7 +766,7 @@ accuracy of test data: <span class="fl">0.9919999837875366</span></code></pre></
     <span class="co"># クラス（カレンダーや飲み物）単位でデータを読み込んで、訓練データとテスト・データに分割し、データ・セットのクラスを生成します。</span>
     <span class="cf">return</span> <span class="bu">map</span>(DataSet, <span class="bu">zip</span>(<span class="op">*</span><span class="bu">map</span>(train_and_test, <span class="bu">map</span>(load_class, <span class="bu">map</span>(partial(os.path.join, data_path), <span class="bu">sorted</span>(os.listdir(data_path)))))))</code></pre></div>
 <p>上半分の<code>class DataSet</code>は、深層学習を使う目的がクラス分類ならば、どのようなデータでも使えると思います。お好きにコピー＆ペーストしてみてください。<code>_shuffle()</code>等でNumPyの面白機能を使っていて、NumPyの奥深さを味わえますな。</p>
-<p>下半分の<code>load()</code>は、対象データが異なれば、書き直しになるでしょう。その書き直しの負荷を減らすにはソース・コードの量を減らすのが有効で、そのためには関数型プログラミングが効く。だから、Pythonの公式文書の<a href="https://docs/python.jp/3/howto/functional.html">関数型プログラミング HOWTO</a>を読んで、関数型で書いてみました。<a href="https://docs/python.jp/3/howto/functional.html">関数型プログラミング HOWTO</a>は非常にわかりやすいので、一読すれば、上のコードのような感じに関数型プログラミングでコード量を削減できますよ。あと、今回は採取できたデータ量が少なかったので、訓練用とテスト用の2つのデータ・セットしか使用しないことにしました。</p>
+<p>下半分の<code>load()</code>は、対象データが異なれば、書き直しになるでしょう。その書き直しの負荷を減らすにはソース・コードの量を減らすのが有効で、そのためには関数型プログラミングが効く。だから、Pythonの公式文書の<a href="https://docs/python.jp/3/howto/functional.html">関数型プログラミング HOWTO</a>を読んで、関数型で書いてみました。<a href="https://docs/python.jp/3/howto/functional.html">関数型プログラミング HOWTO</a>は非常にわかりやすいので、一読するだけで、上のコードのような感じに関数型プログラミングでコード量を削減できますよ。あと、今回は採取できたデータ量が少なかったので、訓練用とテスト用の2つのデータ・セットしか使用しないことにしました。</p>
 <h2 id="jellyfish_eyemodel.py">jellyfish_eye/model.py</h2>
 <p>次は、ニューラル・ネットワークを定義することにしましょう。以下がそのコード。</p>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> tensorflow <span class="im">as</span> tf
@@ -919,9 +923,9 @@ supervisor <span class="op">=</span> tf.train.Supervisor(logdir<span class="op">
 
         <span class="co"># グローバル・ステップをインクリメントします。</span>
         session.run(inc_global_step)</code></pre></div>
-<p>学習するだけなら、前章のコードのような簡単なものでも良いのですけど、学習して終わりじゃあ意味がないですよね？　学習した結果を活用して、サービスを作らないとね。あと、学習の途中でコンピューターが落ちたら最初からやり直しではキツイので、途中から学習を再開できる仕組みも必要です。学習が良い感じに進んでいるかどうか、目で見て確認もしたいですね。</p>
+<p>学習する「だけ」なら、前章のコードのような簡単なものでも良いのですけど、学習して精度を表示して終わりで後には何も残らないんじゃ意味がないですよね？　そう、学習した結果を活用する、サービスまで作らないとね。あと、学習の途中でコンピューターが落ちたら最初からやり直しではキツイので、途中から学習を再開できる仕組みも必要。学習が良い感じに進んでいるかどうか、目で見て確認もしたいですよね。</p>
 <p>というわけで、<code>tf.train.Supervisor</code>を使いましょう。<code>Supervisor</code>を使うと、学習したモデルを<code>save_model_secs</code>で指定したタイミングで保存してくれます。そして、<code>Supervisor</code>経由でセッションを取得すれば、最新の学習結果（<code>logs/checkpoint</code>というファイルの中で指定すれば、最新でなくても可）で初期化されたモデルが手に入ります。これなら、保存された学習結果を活用するサービスを作れますし、学習の途中で中断して、その後に再開することもできます。サマリーも<code>save_summaries_secs</code>で指定した間隔で保存してくれますから、前述したモデルの中でサマリーに追加した情報を見ることもできます。</p>
-<p>たしかに、<code>Supervisor</code>を使うには<code>global_step</code>の作成が必要だったり、<code>global_step</code>をインクリメントする処理が必要だったり、<code>summary_op=None</code>しておかないと<code>feed_dict</code>が必要なサマリーは使えなかったりとか、少し面倒なところはあります。でも、その面倒は、上のコードをコピー＆ペーストすればゼロにできます。対象データやニューラル・ネットワークの内容が異なっても訓練のやり方は変わらないので、上のコードの<code>import</code>する名前空間を変更するだけで、皆様のプロジェクトでも使えると思いますよ。</p>
+<p>たしかに、<code>Supervisor</code>を使うには<code>global_step</code>の作成が必要だったり、<code>global_step</code>をインクリメントする処理が必要だったり、<code>summary_op=None</code>しておかないと<code>feed_dict</code>が必要なサマリーは使えなかったりとか、少し面倒なところはあります。でも、その面倒は、上のコードをコピー＆ペーストすればゼロになります。対象データやニューラル・ネットワークの内容が異なっても訓練のやり方は変わりませんから、上のコードの<code>import</code>する名前空間を変更すれば、皆様のプロジェクトでも使えると思いますよ。</p>
 <h2 id="jellyfish_eyeserve.py">jellyfish_eye/serve.py</h2>
 <p>ついでですから、サービス化の前準備もしてしまいましょう。深層学習した結果を活用して、物体が何なのかを判断する関数を作成します。</p>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> jellyfish_eye.model <span class="im">as</span> model
@@ -966,8 +970,8 @@ session <span class="op">=</span> supervisor.PrepareSession()  <span class="co">
         plot.show()
         
     <span class="bu">print</span>(<span class="st">'Elapsed time: </span><span class="sc">{0:.4f}</span><span class="st"> sec'</span>.<span class="bu">format</span>((finishing_time <span class="op">-</span> starting_time) <span class="op">/</span> <span class="bu">len</span>(test_data_set.inputs)))</code></pre></div>
-<p>前項で紹介した<code>Supervisor</code>を使えば、サービスの提供も簡単です。セッション取得のための時間を節約するために、managed_session()ではなくPrepareSession()するところに注意するだけ。あとは、バッチ学習じゃないので、<code>input</code>から<code>inputs</code>に変換するために形を変換する程度。こっちも、上のコードの上半分をコピー＆ペーストすれば大丈夫だと思いますよ。</p>
-<p>このコードがあれば、以下のようにして他のパッケージから深層学習の結果を利用することができます。</p>
+<p>前項で紹介した<code>Supervisor</code>を使えば、サービスの提供も簡単に実現できます。セッション取得のための時間を節約するために、managed_session()ではなくPrepareSession()するところに注意するだけ。あとは、バッチ学習じゃないので、<code>input</code>から<code>inputs</code>に変換するために形を変換する程度。上のコードの上半分をコピー＆ペーストすれば、ほとんどのプロジェクトで使えると思いますよ。</p>
+<p>なお、このコードは、以下のようにして他のパッケージから深層学習の結果を利用することを想定しています。</p>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="im">import</span> jellyfish_eye.serve
 
 ...
@@ -976,20 +980,21 @@ image <span class="op">=</span> ...  <span class="co"># 深度センサーから
 
 <span class="cf">if</span> jellyfish_eye.serve(image).indices[<span class="dv">0</span>][<span class="dv">0</span>] <span class="op">==</span> <span class="dv">0</span>:  <span class="co"># ディレクトリの名前順でクラスを決めたので、0がcalendarで1がdrink、2がtissue-paper。</span>
   <span class="co"># カレンダーが前に置かれたので、予定をチェックする等の処理を実行する。</span></code></pre></div>
+<p>この利用する側のコードは、頑張って作ってくださいね。</p>
 <h2>実行</h2>
-<p>以上で全てのコードが完成したので、実行してみましょう。Pythonでパッケージ名を指定して実行するときは<code>python -m &lt;パッケージ名&gt;</code>とします。今回のコードの場合は、訓練したいなら<code>python -m jellyfish_eye.train</code>、サービスを提供するなら<code>python -m jellyfish_eye.serve</code>となります。</p>
+<p>以上で、全てのコードが完成です。さっそく実行してみましょう。Pythonでパッケージ名を指定して実行するときは<code>python -m &lt;パッケージ名&gt;</code>とします。今回のコードの場合は、訓練したいなら<code>python -m jellyfish_eye.train</code>、サービスを提供するなら<code>python -m jellyfish_eye.serve</code>となります。</p>
 <p>深層学習の結果は……</p>
 <p>＊＊＊絵＊＊＊</p>
 <p>うん、精度が90%を超えました！　かなり良いんじゃないでしょうか？</p>
-<p>なお、GPUが無い私のコンピューターだとここまで訓練するのにxx分くらいかかりましたが、GeForce 980Tiという型遅れの10万円のGPUを積んだコンピューターで実験してみたら、yy分で終わりました。2017年3月現在なら980Tiよりももっと性能がよい1080が8万円程度で買えますから、もし深層学習に興味を持ったならGPUを買うことをおすすめします。</p>
-<p>あと、学習している間は暇だなーと感じるようでしたら、TensorFlowのツールであるTensorBoardで学習内容を可視化してみてください。TensorBoardの実行は、<code>tesnsorboard --logdir=logs</code>です。TensorBoardが起動したら、Webブラウザを開いてURLに<code>localhost:6006</code>と入れればオッケー。こうすると、前の項で見ていただいたような畳込み結果や入力画像を見られたり、損失関数がどんどん減っている（学習がどんどん進んでいる）ことが分かるので、あまり退屈しないで済みます。</p>
+<p>なお、GPUを積んでいない私の4年前のおんぼろコンピューターだとここまで訓練するのにxx分くらいかかりましたが、NvidiaのGeForce GTX 980 Tiという型遅れの10万円のGPUを積んだコンピューターで実験してみたら、yy分で終わりました。2017年3月現在なら980より圧倒的に速いというGeForce GTX 1080が8万円くらいで買えますから、もし深層学習に興味を持ったならGPUを買うことをおすすめします。</p>
+<p>あと、学習している間が暇だなーと感じるようでしたら、TensorFlowのツールであるTensorBoardで学習内容を可視化してみてください。TensorBoardの実行は、<code>tesnsorboard --logdir=logs</code>です。TensorBoardが起動したら、Webブラウザを開いてURLに<code>localhost:6006</code>と入れればオッケー。こうすると、前の項で見ていただいたような畳込み結果や入力画像を見られたり、損失関数がどんどん減っている（学習がどんどん進んでいる）ことが分かるので、あまり退屈しないで済みます。</p>
 <p>＊＊＊絵＊＊＊</p>
 <p>さて、訓練が終わったので、その結果をサービス化してみると……</p>
 <p>＊＊＊絵＊＊＊</p>
 <p>うん、正しく実行できていますね。深層学習の「学習」には時間がかかりますけど、深層学習した結果を実行するだけなら、GPUなしでもかなり速いです。一回の判断に0.076秒しかかかっていないんですからね。これなら、私のロボットに積んでいるRaspberry Piでも実行できそうです。</p>
 <h1>おわりに</h1>
 <p>ほら、深層学習って、簡単でしょ？　本稿のコードをコピー＆ペーストして、データを取得する部分を書き直して、必要に応じてニューラル・ネットワークをチューニングすればよいだけなんですから。</p>
-<p>多層パーセプトロンや畳込み、プーリング、ドロップアウトという深層学習で使われる道具については、数学なしでもその概念を理解できました<a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a>。概念が分かっているのですから、ニューラル・ネットワークのチューニングは可能なはず<a href="#fn8" class="footnoteRef" id="fnref8"><sup>8</sup></a>。逆誤差伝播学習法の詳細になると数学が必要なのですけど、TensorFlowが全自動でやってくれるから詳細を理解していなくても問題ないし<a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a>。ほらやっぱり、深層学習は簡単。</p>
+<p>多層パーセプトロンや畳込み、プーリング、ドロップアウトという深層学習で使われる道具については、数学なしでもその概念を理解できました<a href="#fn7" class="footnoteRef" id="fnref7"><sup>7</sup></a>。概念が分かっているのですから、ニューラル・ネットワークのチューニングは可能なはず<a href="#fn8" class="footnoteRef" id="fnref8"><sup>8</sup></a>。逆誤差伝播学習法の詳細になると数学が必要なのですけど、TensorFlowが全自動でやってくれるから詳細を理解していなくても問題ないし<a href="#fn9" class="footnoteRef" id="fnref9"><sup>9</sup></a>。ほらやっぱり、深層学習って簡単。</p>
 <p>でも所詮、深層学習って画像が何なのかを判断できるるだけなんでしょ？　データが画像以外だったらどうするのよ……という反論が聞こえてきそうですけど、実は深層学習は画像以外でも使えます。私は先日、ひょんなことから「超音波センサー10個の距離情報から、トイレの個室でのスマートフォン使用を検知する」システムのプロトタイプを作ったのですけど、適当に取った数人×数分のデータを以下のニューラル・ネットワークに食わせて学習してみたら、70%を超える精度が出ちゃいました。</p>
 <div class="sourceCode"><pre class="sourceCode python"><code class="sourceCode python"><span class="kw">def</span> inference():
     outputs <span class="op">=</span> tf.reshape(inputs, (<span class="op">-</span><span class="dv">1</span>, data_sets.history_size, <span class="dv">1</span>, data_sets.channel_size))  <span class="co"># 幅を1にして、1次元データをconvolution2dできるようにします。</span>
@@ -999,7 +1004,7 @@ image <span class="op">=</span> ...  <span class="co"># 深度センサーから
     outputs <span class="op">=</span> tf.contrib.layers.dropout(outputs, is_training<span class="op">=</span>is_training)
 
     <span class="cf">return</span> tf.contrib.layers.linear(outputs, <span class="dv">2</span>)</code></pre></div>
-<p>ちなみに、このニューラル・ネットワークは、<a href="http://tkengo.github.io/blog/2016/03/11/understanding-convolutional-neural-networks-for-nlp/">自然言語処理における畳み込みニューラルネットワークを理解する</a>で引用されている論文（hang, Y., &amp; Wallace, B. (2015). A Sensitivity Analysis of (and Practitioners' Guide to) Convolutional Neural Networks for Sentence Classification）の、文章をカケラも読まずに図だけを見て作ったモノです。深層学習は道具立てが簡単なので、けっこう楽ちんに小難しい論文の内容を活用できるんです。ぜひ、皆様も試してみてください。</p>
+<p>ちなみに、このニューラル・ネットワークは、<a href="http://tkengo.github.io/blog/2016/03/11/understanding-convolutional-neural-networks-for-nlp/">自然言語処理における畳み込みニューラルネットワークを理解する</a>で引用されている論文（hang, Y., &amp; Wallace, B. (2015). A Sensitivity Analysis of (and Practitioners' Guide to) Convolutional Neural Networks for Sentence Classification）の、文章をカケラも読まずに図だけを見て作ったモノです。深層学習は道具立てが簡単なので、けっこう楽ちんに小難しい論文の内容を活用できちゃうんですよ。ぜひ、皆様も試してみてください。</p>
 <section class="footnotes">
 <hr />
 <ol>
