@@ -19,7 +19,7 @@ def inference():
 
 ちなみに、このニューラル・ネットワークは、「[自然言語処理における畳み込みニューラルネットワークを理解する](http://tkengo.github.io/blog/2016/03/11/understanding-convolutional-neural-networks-for-nlp/)」で引用されている論文（hang, Y., & Wallace, B. (2015). A Sensitivity Analysis of (and Practitioners' Guide to) Convolutional Neural Networks for Sentence Classification）の、文章をカケラも読まずに図だけを見て作りました。深層学習は道具立てが簡単なので、けっこう楽ちんに小難しい論文の内容を活用できちゃうんですな。ほら、やっぱり、深層学習は簡単。
 
-ぜひ、皆様も深層学習してみてください。楽しいっすよ。
+ぜひ、皆様も深層学習してみてください。とても楽しいですよ。
 
 
 [^7]: 再帰型ニューラル・ネットワークについての説明は、ごめんなさい、使い方が定まるまで待ってください……。
