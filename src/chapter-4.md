@@ -369,14 +369,14 @@ if __name__ == '__main__':
     for input in test_data_set.inputs:
         classes.append(classify(input))
     finishing_time = time.time()
+        
+    print('Elapsed time: {0:.4f} sec'.format((finishing_time - starting_time) / len(test_data_set.inputs)))
 
     for input, label, class_ in zip(test_data_set.inputs, test_data_set.labels, classes):
         print('{0} : {1}, {2}'.format(label, class_.indices[0][0], tuple(zip(class_.indices[0], class_.values[0]))))
         
         plot.imshow(np.reshape(input, (100, 100, 4)))
         plot.show()
-        
-    print('Elapsed time: {0:.4f} sec'.format((finishing_time - starting_time) / len(test_data_set.inputs)))
 ```
 
 前項で紹介した`Supervisor`を使えば、サービスの提供も簡単に実現できます。セッション取得のための時間を節約するために、managed_session()ではなくPrepareSession()するところに注意するだけ。あとは、バッチ学習じゃないので、`input`から`inputs`に変換するために形を変換する程度。上のコードの上半分をコピー＆ペーストすれば、ほとんどのプロジェクトで使えると思いますよ。
@@ -402,11 +402,11 @@ if jellyfish_eye.serve(image).indices[0][0] == 0:  # ディレクトリの名前
 
 深層学習の結果は……
 
-＊＊＊絵＊＊＊
+![jellyfish-eye.train](images/jellyfish-eye-train-result.png)
 
-うん、精度が90%を超えました！　かなり良いんじゃないでしょうか？
+うん、精度が80%を超えました！　かなり良いんじゃないでしょうか？
 
-なお、GPUを積んでいない私の4年前のおんぼろコンピューターだとここまで訓練するのにxx分くらいかかりましたが、NvidiaのGeForce GTX 980 Tiという型遅れの10万円のGPUを積んだコンピューターで実験してみたら、yy分で終わりました。2017年3月現在なら980より圧倒的に速いというGeForce GTX 1080が8万円くらいで買えますから、もし深層学習に興味を持ったならGPUを買うことをおすすめします。
+なお、GPUを積んでいない私の4年前のおんぼろコンピューターだとここまで訓練するのに1*時間*くらいかかりましたが、NvidiaのGeForce GTX 980 Tiという型遅れの10万円のGPUを積んだコンピューターで実験してみたら、たった1*分*で終わっちゃいました……。2017年3月現在なら980より圧倒的に速いというGeForce GTX 1080が8万円くらいで買えますから、もし深層学習に興味を持ったならGPUを買うことをおすすめします。
 
 あと、学習している間が暇だなーと感じるようでしたら、TensorFlowのツールであるTensorBoardで学習内容を可視化してみてください。TensorBoardの実行は、`tesnsorboard --logdir=logs`です。TensorBoardが起動したら、Webブラウザを開いてURLに`localhost:6006`と入れればオッケー。こうすると、前の項で見ていただいたような畳込み結果や入力画像を見られたり、損失関数がどんどん減っている（学習がどんどん進んでいる）ことが分かるので、あまり退屈しないで済みます。
 
@@ -414,6 +414,6 @@ if jellyfish_eye.serve(image).indices[0][0] == 0:  # ディレクトリの名前
 
 さて、訓練が終わったので、その結果をサービス化してみると……
 
-＊＊＊絵＊＊＊
+![jellyfish-eye.serve](images/jellyfish-eye-serve-result.png)
 
-うん、正しく実行できていますね。深層学習の「学習」には時間がかかりますけど、深層学習した結果を実行するだけなら、GPUなしでもかなり速いです。一回の判断に0.076秒しかかかっていないんですからね。これなら、私のロボットに積んでいるRaspberry Piでも実行できそうです。
+うん、正しく実行できていますね。深層学習の「学習」には時間がかかりますけど、深層学習した結果を実行するだけなら、GPUなしでもかなり速いです。一回の判断に0.067秒しかかかっていないんですからね。これなら、私のロボットに積んでいるRaspberry Piでも、なんとか実行できそうですな。
