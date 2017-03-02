@@ -45,7 +45,7 @@ def load(data_path='./data'):
     def load_class(class_path):
         return tuple(chain.from_iterable(map(load_object, map(partial(os.path.join, class_path), sorted(os.listdir(class_path))))))
 
-    def train_and_test(images):
-        return images[20:], images[:20]
+    def train_validation_and_test(images):
+        return images[20:], images[:20], images[:20]  # データ数が少ないので、検証データとテスト・データは同じにします。
 
-    return map(DataSet, zip(*map(train_and_test, map(load_class, map(partial(os.path.join, data_path), sorted(os.listdir(data_path)))))))
+    return map(DataSet, zip(*map(train_validation_and_test, map(load_class, map(partial(os.path.join, data_path), sorted(os.listdir(data_path)))))))

@@ -20,7 +20,7 @@ if __name__ == '__main__':
     import matplotlib.pyplot as plot
     import time
 
-    _, test_data_set = data_sets.load()
+    _, _, test_data_set = data_sets.load()
     classes = []
 
     starting_time = time.time()
