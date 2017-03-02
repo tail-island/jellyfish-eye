@@ -28,7 +28,7 @@ with supervisor.managed_session() as session:
         if global_step_value % 10 == 0:
             supervisor.summary_computed(session, session.run(summary, feed_dict={inputs: train_inputs, labels: train_labels, is_training: True}))
             
-            print('global step {0:>4d}: train accuracy = {1:.4f}, validatio accuracy = {2:.4f}.'.format(
+            print('global step {0:>4d}: train accuracy = {1:.4f}, validation accuracy = {2:.4f}.'.format(
                 global_step_value,
                 session.run(accuracy, feed_dict={inputs: train_inputs, labels: train_labels}),
                 session.run(accuracy, feed_dict={inputs: validation_data_set.inputs, labels: validation_data_set.labels})))
