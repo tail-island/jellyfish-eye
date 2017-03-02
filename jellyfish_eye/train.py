@@ -24,10 +24,10 @@ with supervisor.managed_session() as session:
 
         train_inputs, train_labels = train_data_set.next_batch(20)
         session.run(train, feed_dict={inputs: train_inputs, labels: train_labels, is_training: True})
-        
+
         if global_step_value % 10 == 0:
             supervisor.summary_computed(session, session.run(summary, feed_dict={inputs: train_inputs, labels: train_labels, is_training: True}))
-            
+
             print('global step {0:>4d}: train accuracy = {1:.4f}, validation accuracy = {2:.4f}.'.format(
                 global_step_value,
                 session.run(accuracy, feed_dict={inputs: train_inputs, labels: train_labels}),
