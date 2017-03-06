@@ -19,7 +19,7 @@ summary = tf.summary.merge_all()
 supervisor = tf.train.Supervisor(logdir='logs', save_model_secs=60, save_summaries_secs=60, summary_op=None)
 
 with supervisor.managed_session() as session:
-    while True:  # not supervisor.should_stop():が正しいはずなのですけど、なぜかWindows環境では動かなかった……。
+    while not supervisor.should_stop():
         global_step_value = session.run(global_step)
 
         train_inputs, train_labels = train_data_set.next_batch(20)
