@@ -8,7 +8,7 @@ inputs = model.inputs
 top_k = tf.nn.top_k(tf.nn.softmax(model.inference()), k=3)
 
 supervisor = tf.train.Supervisor(logdir='logs')
-session = supervisor.PrepareSession()
+session = supervisor.prepare_or_wait_for_session(start_standard_services=False)
 
 
 def classify(input):
