@@ -27,11 +27,11 @@ if __name__ == '__main__':
     for input in test_data_set.inputs:
         classes.append(classify(input))
     finishing_time = time.time()
-        
+
     print('Elapsed time: {0:.4f} sec'.format((finishing_time - starting_time) / len(test_data_set.inputs)))
 
     for input, label, class_ in zip(test_data_set.inputs, test_data_set.labels, classes):
         print('{0} : {1}, {2}'.format(label, class_.indices[0][0], tuple(zip(class_.indices[0], class_.values[0]))))
-        
+
         plot.imshow(np.reshape(input, (100, 100, 4)))
         plot.show()
