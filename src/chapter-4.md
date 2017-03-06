@@ -115,18 +115,18 @@ def load(data_path='./data'):
     def rgbz(line_string):
         # 赤と緑と青と距離に分割し、数値化します。
         return map(float, line_string.split())
-    
+
     # データを1つ、読み込みます。
     def load_image(path):
         # 一行ずつ読み込んで、chain.from_iterableでフラットにします。
         with open(path) as file:
             return tuple(chain.from_iterable(map(rgbz, file)))
-    
+
     # 物体のデータを読み込みます。
     def load_object(object_path):
         # 様々な角度からのデータを読み込みます。
         return map(load_image, filter(lambda path: '.txt' in path, map(partial(os.path.join, object_path), sorted(os.listdir(object_path)))))
-        
+
     # クラス（カレンダーや飲み物）を読み込みます。
     def load_class(class_path):
         # 物体単位でデータを読み込んで、chain.from_iterableでフラットにします。
@@ -166,19 +166,19 @@ def inference():
 
     # 畳み込みできるように、データの形を変更します。
     outputs = summary_image('input', tf.reshape(inputs, (-1, 100, 100, 4)))
-    
+
     # 畳み込みとプーリング（1層目）
     outputs = summary_image_collection('convolution-1', tf.contrib.layers.max_pool2d(tf.contrib.layers.conv2d(outputs, 32, 10), 2))
-    
+
     # 畳み込みとプーリング（2層目）
     outputs = summary_image_collection('convolution-2', tf.contrib.layers.max_pool2d(tf.contrib.layers.conv2d(outputs, 64, 10), 2))
-    
+
     # 全結合層で処理できるように、データの形を変更します。
     outputs = tf.contrib.layers.flatten(outputs)
-    
+
     # 全結合層。1024ニューロンと512ニューロンの2層。
     outputs = tf.contrib.layers.stack(outputs, tf.contrib.layers.fully_connected, (1024, 512))
-    
+
     # ドロップアウト。
     outputs = tf.contrib.layers.dropout(outputs, is_training=is_training)
 
@@ -189,7 +189,7 @@ def inference():
 # 損失関数。
 def loss(logits):
     # summary_scalarは、次の項で説明します。ログを取るんだと思ってください。
-    
+
     # クロス・エントロピーで、損失を計算します。
     return summary_scalar('loss', tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits, labels=labels)))
 
@@ -303,7 +303,7 @@ supervisor = tf.train.Supervisor(logdir='logs', save_model_secs=60, save_summari
 # Supervisor経由で、セッションを取得します。
 with supervisor.managed_session() as session:
     # Supervisorが問題を検出しなければ、学習を繰り返します。
-    while True:  # not supervisor.should_stop():が正しいはずなのですけど、なぜかWindows環境では動かなかった……。
+    while not supervisor.should_stop():
         # グローバル・ステップの値を取得します。
         global_step_value = session.run(global_step)
 
@@ -324,13 +324,18 @@ with supervisor.managed_session() as session:
 
         # グローバル・ステップをインクリメントします。
         session.run(inc_global_step)
+
+
+# もしTensorFlow 1.0とWindowsの環境でlib\site-packages\tensorflow\python\training\supervisor.pyの1044行が例外を吐く場合は、1044行目を以下のように修正してみてください。
+#     steps_per_sec = added_steps / elapsed_time if elapsed_time != 0 else 0
+# どうやら、time.time()の仕様が、Windows環境とLinux/Mac環境で違うみたい……。
 ```
 
 学習する「だけ」なら、前章のコードのような簡単なものでも良いのですけど、学習して精度を表示して終わりで後には何も残らないんじゃ、やる意味がないですよね？　そう、学習した結果を活用する、サービスを作らないと。あと、学習の途中でコンピューターが落ちたら最初からやり直しではキツイので、途中から学習を再開できる仕組みも必要です。学習が良い感じに進んでいるかどうか、目で見て確認もしたいですよね。
 
 というわけで、`tf.train.Supervisor`を使いましょう。`Supervisor`を使うと、学習したモデルを`save_model_secs`で指定したタイミングで保存してくれます。そして、`Supervisor`経由でセッションを取得すれば、最新の学習結果（`logs/checkpoint`というファイルの中で指定すれば、最新でなくても可）で初期化されたモデルが手に入ります。これなら、保存された学習結果を活用するサービスを作れますし、学習の途中で中断して、その後に再開することもできます。サマリーも`save_summaries_secs`で指定した間隔で保存してくれますから、前述したモデルの中でサマリーに追加した様々な情報を可視化できます。
 
-この`Supervisor`を使うには`global_step`の作成が必要だったり、`global_step`をインクリメントする処理が必要だったり、`summary_op=None`しておかないと`feed_dict`が必要なサマリーは使えなかったりと、少し面倒なところはあります。でも、その面倒は、上のコードをコピー＆ペーストすればゼロになって利点だけを手に入れられます。対象データやニューラル・ネットワークの内容が異なっても訓練のやり方は変わりませんから、上のコードの`import`する名前空間を変更するだけで、皆様のプロジェクトでも使えると思いますよ。
+この`Supervisor`を使うには`global_step`の作成が必要だったり、`global_step`をインクリメントする処理が必要だったり、`summary_op=None`しておかないと`feed_dict`が必要なサマリーは使えなかったりと、少し面倒なところはあります。でも、その面倒は、上のコードをコピー＆ペーストすればゼロになって利点だけを手に入れられます（あと、TensorFlow 1.0のバグだと思うんだけど、私の環境ではゼロ除算が発生してしまい、上のコードのコメントに書いたようなパッチを当てなければなりませんでした）。対象データやニューラル・ネットワークの内容が異なっても訓練のやり方は変わりませんから、上のコードの`import`する名前空間を変更するだけで、皆様のプロジェクトでも使えると思いますよ。
 
 ##jellyfish\_eye/serve.py
 
@@ -350,7 +355,7 @@ top_k = tf.nn.top_k(tf.nn.softmax(model.inference()), k=3)
 
 # サービスに必要な環境を整えます。
 supervisor = tf.train.Supervisor(logdir='logs', save_model_secs=0, save_summaries_secs=0)
-session = supervisor.PrepareSession()  # セッションを使いまわしたいので、managed_sessionではなくてPrepareSession()。なんで大文字なんだろ？
+session = supervisor.prepare_or_wait_for_session(start_standard_services=False)
 
 
 # クラスを判断します。
@@ -371,17 +376,17 @@ if __name__ == '__main__':
     for input in test_data_set.inputs:
         classes.append(classify(input))
     finishing_time = time.time()
-        
+
     print('Elapsed time: {0:.4f} sec'.format((finishing_time - starting_time) / len(test_data_set.inputs)))
 
     for input, label, class_ in zip(test_data_set.inputs, test_data_set.labels, classes):
         print('{0} : {1}, {2}'.format(label, class_.indices[0][0], tuple(zip(class_.indices[0], class_.values[0]))))
-        
+
         plot.imshow(np.reshape(input, (100, 100, 4)))
         plot.show()
 ```
 
-前項で紹介した`Supervisor`を使えば、サービスの提供も簡単に実現できます。セッション取得のための時間を節約するために、managed_session()ではなくPrepareSession()するところに注意するだけ。あとは、1件だけのデータをバッチ学習用のニューラル・ネットワークに通すために、`input`から`inputs`に形を変換する程度。まぁ、細かいことは考えずに上のコードの上半分をコピー＆ペーストすれば、ほとんどのプロジェクトで使えると思いますよ。
+前項で紹介した`Supervisor`を使えば、サービスの提供も簡単に実現できます。セッション取得のための時間を節約するために、`managed_session()`ではなく`prepare_or_wait_for_session()`するところに注意するだけ（あと、モデルの保存などの機能は不要なので、念のため`start_standard_services=False`も）。あとは、1件だけのデータをバッチ学習用のニューラル・ネットワークに通すために、`input`から`inputs`に形を変換する程度。まぁ、細かいことは考えずに上のコードの上半分をコピー＆ペーストすれば、ほとんどのプロジェクトで使えると思いますよ。
 
 このコードは、以下のようにして他のパッケージから利用されることを想定しています。
 
@@ -406,9 +411,9 @@ if jellyfish_eye.serve.classify(image).indices[0][0] == 1:  # ディレクトリ
 
 ![jellyfish-eye.train](images/jellyfish-eye-train-result.png)
 
-うん、精度が80%を超えました！　`Ctrl-c`でプログラムを終了してください（`Supervisor`のおかげで途中で止めても再開できますから、ご安心ください）。データが少ないことを考慮すれば、かなり良いんじゃないでしょうか？
+うん、精度90%！　データが少ないことを考慮すれば、かなり良いんじゃないでしょうか？　こんなもんかなーと思ったら、`Ctrl-c`でプログラムを終了してください（`Supervisor`のおかげで途中で止めても再開できますから、ご安心ください）。
 
-なお、GPUを積んでいない私の4年前のおんぼろラップトップPCだとここまで訓練するのに1*時間*くらいかかりましたが、NvidiaのGeForce GTX 980 Tiという1年前に10万円で買ったGPUを積んだPCで実験してみたら、1*分*で終わっちゃいました……。2017年3月現在なら980より圧倒的に速いというGeForce GTX 1080が8万円くらいで買えますので、もし深層学習に興味を持ったならGPUの購入をおすすめします。
+なお、GPUを積んでいない私の4年前のおんぼろラップトップPCだとここまで訓練するのに30*分*くらいかかりましたが、NvidiaのGeForce GTX 980 Tiという1年前に10万円で買ったGPUを積んだPCで実験してみたら、30*秒*で終わっちゃいました……。2017年3月現在なら980より圧倒的に速いというGeForce GTX 1080が8万円くらいで買えますので、もし深層学習に興味を持ったならGPUの購入をおすすめします。
 
 あと、学習している間が暇だなーと感じるようでしたら、TensorFlowのツールであるTensorBoardで学習内容を可視化してみてください。TensorBoardは、コマンドラインから`tesnsorboard --logdir=logs`と入力すれば起動できます。コマンドライン上でTensorBoardが起動したら、Webブラウザを開いてURLに`localhost:6006`と入れればオッケー。こうすると、前の項で見ていただいたような畳込み結果や入力画像を見られたり、損失関数がどんどん減っている（学習がどんどん進んでいる）ことが分かるので、あまり退屈しないで済みます。
 
