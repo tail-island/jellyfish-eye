@@ -3,8 +3,6 @@ import jellyfish_eye.model as model
 import tensorflow as tf
 
 
-tf.logging.set_verbosity(tf.logging.INFO)
-
 train_data_set, validation_data_set, _ = data_sets.load()
 
 inputs = model.inputs
