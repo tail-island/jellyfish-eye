@@ -16,7 +16,7 @@ accuracy = model.accuracy(logits)
 global_step = tf.contrib.framework.get_or_create_global_step()
 inc_global_step = tf.assign(global_step, tf.add(global_step, 1))
 summary = tf.summary.merge_all()
-supervisor = tf.train.Supervisor(logdir='logs', summary_op=None)
+supervisor = tf.train.Supervisor(logdir='logs', save_model_secs=60, save_summaries_secs=60, summary_op=None)
 
 with supervisor.managed_session() as session:
     while not supervisor.should_stop():
