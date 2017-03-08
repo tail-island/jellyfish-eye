@@ -49,13 +49,28 @@
 #     # テスト・データでの精度を出力します。
 #     print("accuracy of test data: {0}".format(session.run(accuracy, feed_dict={images: test_data_set.images, labels: test_data_set.labels})))
 
+########
 
-import matplotlib.pyplot as plot
-import scipy as sp
+# import matplotlib.pyplot as plot
+# import scipy as sp
 
-xs = sp.arange(-10, 10, 0.1)
-ys = [max(x, 0) for x in xs]
+# xs = sp.arange(-10, 10, 0.1)
+# ys = [max(x, 0) for x in xs]
 
-plot.plot(xs, ys)
-plot.ylim(-10, 10)
-plot.show()
+# plot.plot(xs, ys)
+# plot.ylim(-10, 10)
+# plot.show()
+
+########
+
+import cv2  # 動かす前に、pip install opencv-pythonしておいてください。
+import matplotlib.pyplot as plot  # 動かす前に、pip install matplotlibしておいてください。
+import numpy as np
+
+# 画像を読み込んで、白黒に変換します。
+image = cv2.cvtColor(cv2.imread('./images/lena.jpg'), cv2.COLOR_BGR2GRAY)
+
+for y in range(10):
+    for x in range(10):
+        print('{0:.2f} '.format(float(image[y, x]) / 255), end='')
+    print()
